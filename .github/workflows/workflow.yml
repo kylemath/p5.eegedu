@@ -30,30 +30,9 @@ jobs:
       - name: Build
         run: yarn build
 
-      - name: Create artifact dir
-        run: |
-          mkdir -p artifacts
-
-      - name: Archive Produciton Artifacts
-        uses: actions/upload-artifact@master
-        with:
-          name: build
-          path: build
-
-  deploy:
-    name: Deploy to Firebase
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@master
-      - name: Download Production Artifacts
-        uses: actions/download-artifact@master
-        with:
-          name: build
       - name: Deploy to Firebase
-        uses: w9jds/firebase-action@master
+      - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          args: deploy --only hosting
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_PFIVE_A752E }}'
+          projectId: pfive-a752e
