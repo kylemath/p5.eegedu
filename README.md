@@ -52,6 +52,8 @@ If it is working correctly, the p5.EEGEdu application will open in a browser win
 To start the *Local Production Environment*, you can use the following commands: 
 
 ```sh
+# blank slate
+yarn cache clean
 yarn run build
 serve -s build
 ```
