@@ -1,18 +1,14 @@
-# EEGEdu
+# P5.EEGEdu
 
-EEGEdu is an educational website to learn about working with electroencephalogram (EEG) data. It is a teaching tool that allows for students to quickly interact with their own brain waves. 
+P5.EEGEdu is an educational website to learn about coding live animations with electroencephalogram (EEG) data. It is a teaching tool that allows for students to quickly interact with their own brain waves. 
 
-It is an interactive web page that you interact with multiple demonstrations of working with EEG data. It is partially inspired by [EEG101](https://github.com/NeuroTechX/eeg-101) but it is strictly web-based. This allows students to interact with EEG brain data without having to install any software.
-
-This is a useful set of tools that has been inspired by multiple works that came before. Previously, others in the field have been using [Neurotech EEG-notebooks in python](https://github.com/NeuroTechX/eeg-notebooks) for data collection and analysis with [muse-lsl](https://github.com/alexandrebarachant/muse-lsl).  These software support the Interaxon MUSE headset but required a bluetooth low-energey (BLE) dongle to work with Windows of Mac systems. It also required the editing of some pyglatt code to connect properly. These software are cumbersome, and serve as a barrier to entry for many students learning about EEG. 
-
-Visit [https://eegedu.com/](https://eegedu.com/]) for the live website.
+Visit [https://p5.eegedu.com/](https://p5.eegedu.com/]) for the live p5 sandbox website.
 
 # Installation for Development 
 
-If you are interested in developing EEGEdu, here are some instructions to get you started.
+If you are interested in developing p5.EEGEdu, here are some instructions to get you started.
 
-Note: Currently EEGEdu development requires a Mac OSX operating system. 
+Note: Currently p5.EEGEdu development requires a Mac OSX operating system. 
 
 To start, you will need to install [Homebrew](https://brew.sh) and [yarn](https://yarnpkg.com/lang/en/docs/install/#mac-stable). These are easy one-line installations for Mac users: 
 
@@ -32,8 +28,8 @@ brew install yarn
 Then, in terminal, clone the git repo and enter the folder:
 
 ```sh
-git clone https://github.com/kylemath/EEGEdu
-cd EEGEdu
+git clone https://github.com/kylemath/p5.EEGEdu
+cd p5.EEGEdu
 ```
 
 You then need to install the required packages for EEGEdu
@@ -43,13 +39,13 @@ yarn install
 ```
 
 ## Local Development Environment
-Then, you can run the *Development Environment* of EEGEdu:
+Then, you can run the *Development Environment* of p5.EEGEdu:
 
 ```sh
 yarn start dev
 ```
 
-If it is working correctly, the EEGEdu application will open in a browser window at http://localhost:3000.
+If it is working correctly, the p5.EEGEdu application will open in a browser window at http://localhost:3000.
 
 ## Local Production Environment
 
@@ -62,25 +58,12 @@ serve -s build
 
 ## Deployment
 
-[EEGEdu](https://eegedu.com) is running on [Firebase](https://firebase.google.com/) and deployment happens automagically using GitHub post-commit hooks, or [Actions](https://github.com/kylemath/EEGEdu/actions), as they are commonly called. You can see how the application is build and deployed by [inspecting the workflow](https://github.com/kylemath/EEGEdu/blob/master/.github/workflows/workflow.yml).
+[p5.EEGEdu](https://p5.eegedu.com) is running on [Firebase](https://firebase.google.com/) and deployment happens automagically using GitHub post-commit hooks, or [Actions](https://github.com/kylemath/EEGEdu/actions), as they are commonly called. You can see how the application is build and deployed by [inspecting the workflow](https://github.com/kylemath/EEGEdu/blob/master/.github/workflows/workflow.yml).
 
 # Contributing
-The guide for contributors can be found [here](https://github.com/kylemath/EEGEdu/blob/master/CONTRIBUTING.md). It covers everything you need to know to start contributing to EEGEdu.
+The guide for contributors can be found [here](https://github.com/kylemath/EEGEdu/blob/master/CONTRIBUTING.md). It covers everything you need to know to start contributing to p5.EEGEdu.
 
 # Development Roadmap 
-
-We are aiming to include chances for students to interact with EEG-based brain signals. So we might break down a curriculum into 10 lessons as follows:
-
-1. Connect + hardware
-2. Biophysics + signal viewing
-3. Simple evoked example
-4. Frequency domain explanation
-5. Raw spectra
-6. Frequency bands
-7. Spectrogram
-8. Record data
-9. BCI trainer
-10. p5js demos: https://p5js.org/
 
 # References
 
@@ -94,8 +77,8 @@ We are aiming to include chances for students to interact with EEG-based brain s
 
 # Credits
 
-`EEGEdu` - An Interactive Electrophysiology Tutorial with the Interaxon Muse brought to you by Mathewson Sons
+`p5.EEGEdu` - An Interactive Electrophysiology P5 Animation Coding Sandbox with the Interaxon Muse brought to you by Mathewson Sons
 
 # License
 
-[EEGEdu is licensed under The MIT License (MIT)](https://github.com/kylemath/EEGEdu/blob/master/LICENSE)
+[p5.EEGEdu is licensed under The MIT License (MIT)](https://github.com/kylemath/p5.EEGEdu/blob/master/LICENSE)
