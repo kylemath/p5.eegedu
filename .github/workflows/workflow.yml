@@ -30,7 +30,29 @@ jobs:
       - name: Build
         run: yarn build
 
+      - name: Create artifact dir
+        run: |
+          mkdir -p artifacts
+      - name: Archive Produciton Artifacts
+        uses: actions/upload-artifact@master
+        with:
+          name: build
+          path: build
+
+  deploy:
+    name: Deploy to Firebase
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@master
+      - name: Download Production Artifacts
+        uses: actions/download-artifact@master
+        with:
+          name: build
       - name: Deploy to Firebase
-        run: npx firebase-tools deploy --token $FIREBASE_TOKEN
+        uses: w9jds/firebase-action@master
+        with:
+          args: deploy --only hosting
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
