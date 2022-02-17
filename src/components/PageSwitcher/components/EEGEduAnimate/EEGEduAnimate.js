@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from "react";
+import React, { useRef } from "react";
 import { Card, Button, ButtonGroup } from "@shopify/polaris";
 import { zipSamples, MuseClient } from "muse-js";
 import { bandpassFilter, epoch, fft, powerByBand } from "@neurosity/pipes";
@@ -7,7 +7,7 @@ import { Subject } from "rxjs";
 import Sketch from "react-p5";
 import styled from "styled-components";
 import { LiveProvider, LiveEditor, LiveError, LivePreview } from "react-live";
-import { saveAs } from 'file-saver';
+// import { saveAs } from 'file-saver';
 
 
 
