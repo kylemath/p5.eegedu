@@ -1,6 +1,6 @@
 {
-  "short_name": "EEGEdu",
-  "name": "EEGedu Application",
+  "short_name": "p5.EEGEdu",
+  "name": "p5.EEGedu Application",
   "icons": [
     {
       "src": "favicon.ico",
