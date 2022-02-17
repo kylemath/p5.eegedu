@@ -1,5 +1,5 @@
-import React, { useRef } from "react";
-import { Card } from "@shopify/polaris";
+import React, { useState, useCallback, useRef } from "react";
+import { Card, Button, ButtonGroup } from "@shopify/polaris";
 import { zipSamples, MuseClient } from "muse-js";
 import { bandpassFilter, epoch, fft, powerByBand } from "@neurosity/pipes";
 import { catchError, multicast } from "rxjs/operators";
@@ -7,6 +7,9 @@ import { Subject } from "rxjs";
 import Sketch from "react-p5";
 import styled from "styled-components";
 import { LiveProvider, LiveEditor, LiveError, LivePreview } from "react-live";
+import { saveAs } from 'file-saver';
+
+
 
 import { mockMuseEEG } from "../../utils/mockMuseEEG";
 import { chartStyles } from "../chartOptions";
@@ -123,8 +126,9 @@ export function Animate(connection) {
 
   buildBrain();
 
-  function renderCharts() {
-    const scope = { styled, brain, React, Sketch };
+  function renderEditor() {
+
+     const scope = { styled, brain, React, Sketch };
     const code = `
      class MySketch extends React.Component {
       setup(p5, whereToPlot) {
@@ -204,10 +208,26 @@ export function Animate(connection) {
           EEG bands and locations are available by calling brain.current.RightFrontAlpha
         </p>
       </Card.Section>
-
       <Card.Section>
-        <div style={chartStyles.wrapperStyle.style}>{renderCharts()}</div>
+        <div style={chartStyles.wrapperStyle.style}>{renderEditor()}</div>
       </Card.Section>
+       <Card.Section>
+          <ButtonGroup>
+            <Button
+              onClick={() => {
+                saveToCSV();
+              }}
+              primary={connection.status.connected}
+              disabled={!connection.status.connected}
+            >
+             {'Save Code to CSV'}
+            </Button>
+          </ButtonGroup>
+        </Card.Section>      
     </Card>
   );
+}
+
+function saveToCSV() {
+  console.log('Saving')
 }
