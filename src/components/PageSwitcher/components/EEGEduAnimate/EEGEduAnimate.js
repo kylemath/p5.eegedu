@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef } from "react";
-import { Card, Button, ButtonGroup, TextField } from "@shopify/polaris";
+import { Card, Button, ButtonGroup, TextField, DropZone, Stack, Caption} from "@shopify/polaris";
 import { zipSamples, MuseClient } from "muse-js";
 import { bandpassFilter, epoch, fft, powerByBand } from "@neurosity/pipes";
 import { catchError, multicast } from "rxjs/operators";
@@ -26,6 +26,26 @@ const animateSettings = {
 };
 
 export function Animate(connection) {
+
+  // fileload dropzone
+const [file, setFile] = useState();
+
+  const handleDropZoneDrop = useCallback(
+    (_dropFiles, acceptedFiles, _rejectedFiles) =>
+      setFile((file) => acceptedFiles[0]),
+    [],
+  );
+
+  const fileUpload = !file && <DropZone.FileUpload />;
+  const uploadedFile = file && (
+    <Stack>
+      <div>
+        {file.name} <Caption>{file.size} bytes</Caption>
+      </div>
+    </Stack>
+  );
+
+  // filename 
   const [filename, setFilename] = useState('MySketchName.p5');
   const handleFilenameChange = useCallback((newValue) => setFilename(newValue), []);
 
@@ -215,9 +235,27 @@ export function Animate(connection) {
               disabled={!connection.status.connected}
             >
              {'Save Code to text file'}
-            </Button>          
+            </Button>  
+            <Button
+              onClick={() => {
+                loadFromCSV();
+              }}
+              primary={connection.status.connected}
+              disabled={!connection.status.connected}
+            >
+             {'Save Code to text file'}
+            </Button>                                
           </ButtonGroup>
-        </Card.Section>    
+        </Card.Section> 
+        <Card.Section>
+          <DropZone 
+            allowMultiple={false} 
+            onDrop={handleDropZoneDrop}
+          >
+            {uploadedFile}
+            {fileUpload}
+          </DropZone>
+        </Card.Section>   
       </LiveProvider>
     );
 
@@ -226,6 +264,11 @@ export function Animate(connection) {
       var blob = new Blob([code], {type: "text/plain;charset=utf-8"});
       saveAs(blob, filename);
     }  
+    function loadFromCSV() {
+      console.log('Loading')
+      console.log(file)
+
+    }     
   }
 
   return (
