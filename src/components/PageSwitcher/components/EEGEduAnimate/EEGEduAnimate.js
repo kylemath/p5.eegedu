@@ -1,5 +1,5 @@
-import React, { useRef } from "react";
-import { Card } from "@shopify/polaris";
+import React, { useState, useCallback, useRef } from "react";
+import { Card, Button, ButtonGroup, TextField } from "@shopify/polaris";
 import { zipSamples, MuseClient } from "muse-js";
 import { bandpassFilter, epoch, fft, powerByBand } from "@neurosity/pipes";
 import { catchError, multicast } from "rxjs/operators";
@@ -7,6 +7,9 @@ import { Subject } from "rxjs";
 import Sketch from "react-p5";
 import styled from "styled-components";
 import { LiveProvider, LiveEditor, LiveError, LivePreview } from "react-live";
+import { saveAs } from 'file-saver';
+
+
 
 import { mockMuseEEG } from "../../utils/mockMuseEEG";
 import { chartStyles } from "../chartOptions";
@@ -23,6 +26,9 @@ const animateSettings = {
 };
 
 export function Animate(connection) {
+  const [filename, setFilename] = useState('MySketchName.p5');
+  const handleFilenameChange = useCallback((newValue) => setFilename(newValue), []);
+
   const brain = useRef({
           LeftBackDelta: 0,
           LeftBackTheta: 0, 
@@ -123,8 +129,9 @@ export function Animate(connection) {
 
   buildBrain();
 
-  function renderCharts() {
-    const scope = { styled, brain, React, Sketch };
+  function renderEditor() {
+
+     const scope = { styled, brain, React, Sketch };
     const code = `
      class MySketch extends React.Component {
       setup(p5, whereToPlot) {
@@ -187,9 +194,38 @@ export function Animate(connection) {
       <LiveProvider code={code} scope={scope} noInline={true} theme={theme}>
         <LivePreview />
         <LiveEditor />
+        <Card.Section>        
         <LiveError />
+        </Card.Section>
+        <Card.Section>
+          <TextField
+            label="Filename:"
+            value={filename}
+            onChange={handleFilenameChange}
+            autoComplete="off"
+          />
+        </Card.Section>
+        <Card.Section>
+          <ButtonGroup>
+            <Button
+              onClick={() => {
+                saveToCSV();
+              }}
+              primary={connection.status.connected}
+              disabled={!connection.status.connected}
+            >
+             {'Save Code to text file'}
+            </Button>          
+          </ButtonGroup>
+        </Card.Section>    
       </LiveProvider>
     );
+
+    function saveToCSV() {
+      console.log('Saving')
+      var blob = new Blob([code], {type: "text/plain;charset=utf-8"});
+      saveAs(blob, filename);
+    }  
   }
 
   return (
@@ -204,10 +240,12 @@ export function Animate(connection) {
           EEG bands and locations are available by calling brain.current.RightFrontAlpha
         </p>
       </Card.Section>
-
       <Card.Section>
-        <div style={chartStyles.wrapperStyle.style}>{renderCharts()}</div>
+        <div style={chartStyles.wrapperStyle.style}>{renderEditor()}</div>
       </Card.Section>
+  
     </Card>
   );
 }
+
+
