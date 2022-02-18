@@ -1,5 +1,5 @@
-import React, { useRef } from "react";
-import { Card, Button, ButtonGroup } from "@shopify/polaris";
+import React, { useState, useCallback, useRef } from "react";
+import { Card, Button, ButtonGroup, TextField } from "@shopify/polaris";
 import { zipSamples, MuseClient } from "muse-js";
 import { bandpassFilter, epoch, fft, powerByBand } from "@neurosity/pipes";
 import { catchError, multicast } from "rxjs/operators";
@@ -26,6 +26,9 @@ const animateSettings = {
 };
 
 export function Animate(connection) {
+  const [filename, setFilename] = useState('MySketchName.p5');
+  const handleFilenameChange = useCallback((newValue) => setFilename(newValue), []);
+
   const brain = useRef({
           LeftBackDelta: 0,
           LeftBackTheta: 0, 
@@ -187,12 +190,19 @@ export function Animate(connection) {
     )
     `;
 
+
     return (
       <LiveProvider code={code} scope={scope} noInline={true} theme={theme}>
         <LivePreview />
         <LiveEditor />
         <LiveError />
         <Card.Section>
+          <TextField
+            label="Filename:"
+            value={filename}
+            onChange={handleFilenameChange}
+            autoComplete="off"
+          />
           <ButtonGroup>
             <Button
               onClick={() => {
@@ -211,7 +221,7 @@ export function Animate(connection) {
     function saveToCSV() {
       console.log('Saving')
       var blob = new Blob([code], {type: "text/plain;charset=utf-8"});
-      saveAs(blob, "test.csv");
+      saveAs(blob, filename);
     }  
   }
 
