@@ -7,7 +7,7 @@ import { Subject } from "rxjs";
 import Sketch from "react-p5";
 import styled from "styled-components";
 import { LiveProvider, LiveEditor, LiveError, LivePreview } from "react-live";
-// import { saveAs } from 'file-saver';
+import { saveAs } from 'file-saver';
 
 
 
@@ -192,8 +192,27 @@ export function Animate(connection) {
         <LivePreview />
         <LiveEditor />
         <LiveError />
+        <Card.Section>
+          <ButtonGroup>
+            <Button
+              onClick={() => {
+                saveToCSV();
+              }}
+              primary={connection.status.connected}
+              disabled={!connection.status.connected}
+            >
+             {'Save Code to CSV'}
+            </Button>
+          </ButtonGroup>
+        </Card.Section>    
       </LiveProvider>
     );
+
+    function saveToCSV() {
+      console.log('Saving')
+      var blob = new Blob([code], {type: "text/plain;charset=utf-8"});
+      saveAs(blob, "test.csv");
+    }  
   }
 
   return (
@@ -211,23 +230,9 @@ export function Animate(connection) {
       <Card.Section>
         <div style={chartStyles.wrapperStyle.style}>{renderEditor()}</div>
       </Card.Section>
-       <Card.Section>
-          <ButtonGroup>
-            <Button
-              onClick={() => {
-                saveToCSV();
-              }}
-              primary={connection.status.connected}
-              disabled={!connection.status.connected}
-            >
-             {'Save Code to CSV'}
-            </Button>
-          </ButtonGroup>
-        </Card.Section>      
+  
     </Card>
   );
 }
 
-function saveToCSV() {
-  console.log('Saving')
-}
+
