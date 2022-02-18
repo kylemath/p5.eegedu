@@ -8,7 +8,7 @@ import Sketch from "react-p5";
 import styled from "styled-components";
 import { LiveProvider, LiveEditor, LiveError, LivePreview } from "react-live";
 import { saveAs } from 'file-saver';
-
+import {Papa} from 'papaparse'
 
 
 import { mockMuseEEG } from "../../utils/mockMuseEEG";
@@ -267,6 +267,11 @@ const [file, setFile] = useState();
     function loadFromCSV() {
       console.log('Loading')
       console.log(file)
+      Papa.parse(file, {
+        complete: function(results) {
+          console.log(results);
+        }
+      });
 
     }     
   }
