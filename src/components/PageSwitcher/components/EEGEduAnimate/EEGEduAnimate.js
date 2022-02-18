@@ -190,12 +190,13 @@ export function Animate(connection) {
     )
     `;
 
-
     return (
       <LiveProvider code={code} scope={scope} noInline={true} theme={theme}>
         <LivePreview />
         <LiveEditor />
+        <Card.Section>        
         <LiveError />
+        </Card.Section>
         <Card.Section>
           <TextField
             label="Filename:"
@@ -203,6 +204,8 @@ export function Animate(connection) {
             onChange={handleFilenameChange}
             autoComplete="off"
           />
+        </Card.Section>
+        <Card.Section>
           <ButtonGroup>
             <Button
               onClick={() => {
@@ -211,8 +214,8 @@ export function Animate(connection) {
               primary={connection.status.connected}
               disabled={!connection.status.connected}
             >
-             {'Save Code to CSV'}
-            </Button>
+             {'Save Code to text file'}
+            </Button>          
           </ButtonGroup>
         </Card.Section>    
       </LiveProvider>
