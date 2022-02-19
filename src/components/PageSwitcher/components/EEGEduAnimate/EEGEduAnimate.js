@@ -268,7 +268,7 @@ export function Animate(connection) {
     function saveFile() {
       const text = document.getElementById("liveEditor").firstChild.value;
       const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
-      saveAs(blob, fileName + ".txt");
+      saveAs(blob, fileName );
     }
     function loadFile() {
       uploadFile.text().then((content) => setFileContents(content));
