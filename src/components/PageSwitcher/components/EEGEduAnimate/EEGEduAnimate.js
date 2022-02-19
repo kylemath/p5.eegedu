@@ -35,6 +35,8 @@ class MySketch extends React.Component {
  setup(p5, whereToPlot) {
    p5.createCanvas(500, 500).parent(whereToPlot)
    value = 0;
+   p5.background(255,255,200);
+
  }
 
  draw(p5) {
@@ -54,10 +56,9 @@ class MySketch extends React.Component {
    LEFTALPHA = brain.current.RightFrontAlpha;
    RIGHTALPHA = brain.current.LeftFrontAlpha;
 
-   p5.background(255,200,value);
-   p5.fill(value);
-   p5.stroke(255-value);
+   p5.fill(200, 120, 100);
    p5.ellipse(MOUSEX-100,MOUSEY,LEFTALPHA*2);
+   p5.fill(20, 200, 255);
    p5.ellipse(MOUSEX+100,MOUSEY,RIGHTALPHA*2);
  }
 
