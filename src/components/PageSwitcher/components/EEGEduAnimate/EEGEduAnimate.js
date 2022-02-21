@@ -34,7 +34,7 @@ const defaultEditorCode = `
 class MySketch extends React.Component {
  setup(p5, whereToPlot) {
    p5.createCanvas(500, 500).parent(whereToPlot)
-   value = 0;
+   clickValue = 0;
    p5.background(255,255,200);
 
  }
@@ -56,19 +56,19 @@ class MySketch extends React.Component {
    LEFTALPHA = brain.current.RightFrontAlpha;
    RIGHTALPHA = brain.current.LeftFrontAlpha;
 
-   p5.fill(200, 120, 100);
+   p5.fill(200, 120, clickValue);
    p5.ellipse(MOUSEX-100,MOUSEY,LEFTALPHA*2);
-   p5.fill(20, 200, 255);
+   p5.fill(20, 200, clickValue);
    p5.ellipse(MOUSEX+100,MOUSEY,RIGHTALPHA*2);
  }
 
  // other p5 functions can be created like this
  // but must be included below in the return call
  mouseClicked(p5) {
-   if (value === 0) {
-     value = 255;
+   if (clickValue === 0) {
+     clickValue = 255;
      } else {
-     value = 0;
+     clickValue = 0;
      }
  }
 
