@@ -2,6 +2,7 @@ import React, { useState, useCallback, useRef } from "react";
 import {
   Card,
   Button,
+  ButtonGroup,
   TextField,
   DropZone,
   Stack,
@@ -119,7 +120,7 @@ render (
 export function Animate(connection) {
   const [uploadFile, setUploadFile] = useState();
   const [fileName, setFileName] = useState("MySketch.p5");
-  const [fileContents, setFileContents] = useState(defaultEditorCode);
+  let [fileContents, setFileContents] = useState(defaultEditorCode);
 
   const handleDropZoneDrop = useCallback(
     (_dropFiles, acceptedFiles, _rejectedFiles) => {
@@ -253,6 +254,25 @@ export function Animate(connection) {
         theme={theme}
       >
         <LivePreview />
+        <br />
+        <ButtonGroup>
+          <Button
+            onClick={() => {
+              runCode();
+            }}
+            primary
+          >
+            {'Reset to Loaded'}
+          </Button>
+          <Button
+            onClick={() => {
+              resetCode();
+            }}
+            primary
+          >
+            {'Reset to Default'}
+          </Button>    
+        </ButtonGroup>    
         <LiveEditor id="liveEditor" />
         <Card.Section>
           <LiveError />
@@ -300,6 +320,12 @@ export function Animate(connection) {
     }
     function loadFile() {
       uploadFile.text().then((content) => setFileContents(content));
+    }
+    function runCode() {
+      setFileContents(fileContents.concat(' '))
+    }
+    function resetCode() {
+      setFileContents(defaultEditorCode.concat(' '))
     }
   }
 
