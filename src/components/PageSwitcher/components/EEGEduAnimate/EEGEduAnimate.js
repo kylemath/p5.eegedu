@@ -34,12 +34,10 @@ const defaultEditorCode = `class MySketch extends React.Component {
  setup(p5, whereToPlot) {
    p5.createCanvas(500, 500).parent(whereToPlot)
    clickValue = 0;
-   p5.background(255,255,200);
-
  }
 
  draw(p5) {
-   p5.background(255,255,200);
+   p5.background(clickValue,255,200);
 
    // You can set some useful variables
    // to use more often like this:
