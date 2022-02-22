@@ -280,7 +280,8 @@ export function Animate(connection) {
           >
             {'Reset to Default'}
           </Button>    
-        </ButtonGroup>    
+        </ButtonGroup>
+        <br />    
         <LiveEditor id="liveEditor" />
         <Card.Section>
           <LiveError />
