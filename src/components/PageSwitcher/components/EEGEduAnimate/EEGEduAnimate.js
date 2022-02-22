@@ -258,7 +258,15 @@ export function Animate(connection) {
         <ButtonGroup>
           <Button
             onClick={() => {
-              runCode();
+              runCurrentCode();
+            }}
+            primary
+          >
+            {'Run Current Code'}
+          </Button>        
+          <Button
+            onClick={() => {
+              resetLoadedCode();
             }}
             primary
           >
@@ -266,7 +274,7 @@ export function Animate(connection) {
           </Button>
           <Button
             onClick={() => {
-              resetCode();
+              resetDefaultCode();
             }}
             primary
           >
@@ -321,10 +329,14 @@ export function Animate(connection) {
     function loadFile() {
       uploadFile.text().then((content) => setFileContents(content));
     }
-    function runCode() {
+    function runCurrentCode() {
+      //something here, can't find the current code in the editor
+      //setFileContents(LiveProvider.code)
+    }
+    function resetLoadedCode() {
       setFileContents(fileContents.concat(' '))
     }
-    function resetCode() {
+    function resetDefaultCode() {
       setFileContents(defaultEditorCode.concat(' '))
     }
   }
