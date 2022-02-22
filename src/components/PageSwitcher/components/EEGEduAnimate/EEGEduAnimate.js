@@ -21,17 +21,16 @@ import { chartStyles } from "../chartOptions";
 import theme from "./p5Theme";
 
 const animateSettings = {
-  cutOffLow: 2,
-  cutOffHigh: 20,
+  cutOffLow: .1,
+  cutOffHigh: 128,
   nbChannels: 4,
-  interval: 16,
+  interval: 32,
   bins: 256,
   duration: 128,
   srate: 256,
 };
 
-const defaultEditorCode = `
-class MySketch extends React.Component {
+const defaultEditorCode = `class MySketch extends React.Component {
  setup(p5, whereToPlot) {
    p5.createCanvas(500, 500).parent(whereToPlot)
    clickValue = 0;
@@ -40,6 +39,8 @@ class MySketch extends React.Component {
  }
 
  draw(p5) {
+   p5.background(255,255,200);
+
    // You can set some useful variables
    // to use more often like this:
    // Notice how everything starts with p5.
@@ -53,18 +54,45 @@ class MySketch extends React.Component {
    // Front, Back
    // Delta, Theta, Alpha, Beta, Gamma
    // e.g.:
-   LEFTALPHA = brain.current.RightFrontAlpha;
-   RIGHTALPHA = brain.current.LeftFrontAlpha;
+   DELTA = brain.current.LeftBackDelta;
+   THETA = brain.current.LeftBackTheta;
+   ALPHA = brain.current.LeftBackAlpha;   
+   BETA =  brain.current.LeftBackBeta;
+   GAMMA =  brain.current.LeftBackGamma;
+   
+   gap = (DELTA + THETA + ALPHA + BETA + GAMMA)/5;
+   
+   p5.textSize(DELTA);
+   p5.fill(clickValue,DELTA*5,20);
+   p5.text('Delta', MOUSEX+40, MOUSEY-(2*gap));
+   p5.ellipse(MOUSEX,MOUSEY-(2*gap),DELTA);
 
-   p5.fill(200, 120, clickValue);
-   p5.ellipse(MOUSEX-100,MOUSEY,LEFTALPHA*2);
-   p5.fill(20, 200, clickValue);
-   p5.ellipse(MOUSEX+100,MOUSEY,RIGHTALPHA*2);
+   p5.textSize(THETA);
+   p5.fill(20, clickValue, THETA*5);
+   p5.text('Theta', MOUSEX+40, MOUSEY-(1*gap));
+   p5.ellipse(MOUSEX,MOUSEY-(1*gap),THETA);
+
+   p5.textSize(ALPHA);
+   p5.fill(ALPHA*5, clickValue, clickValue);
+   p5.text('Alpha', MOUSEX+40, MOUSEY);   
+   p5.ellipse(MOUSEX,MOUSEY,ALPHA);
+
+   p5.textSize(BETA);
+   p5.fill(BETA*5, clickValue, BETA*5);
+   p5.text('Beta', MOUSEX+40, MOUSEY+(1*gap));   
+   p5.ellipse(MOUSEX,MOUSEY+(1*gap),BETA);
+
+   p5.textSize(GAMMA);
+   p5.fill(clickValue, GAMMA*5/2, GAMMA*5);
+   p5.text('Gamma', MOUSEX+40, MOUSEY+(2*gap));   
+   p5.ellipse(MOUSEX,MOUSEY+(2*gap),GAMMA);
+      
  }
 
  // other p5 functions can be created like this
  // but must be included below in the return call
  mouseClicked(p5) {
+   p5.background(200,255,210)
    if (clickValue === 0) {
      clickValue = 255;
      } else {
@@ -87,6 +115,7 @@ class MySketch extends React.Component {
 render (
  <MySketch />
 )
+
 `;
 
 export function Animate(connection) {
