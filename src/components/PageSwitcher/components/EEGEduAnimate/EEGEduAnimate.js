@@ -84,12 +84,11 @@ export function Animate(connection) {
 
   const handleSelectWebCodeChange = useCallback((value) =>
     setSelectedWebCode(value),
-    readFile(selectedWebCode),
     []
   );
 
   // Main file in use
-  const [fileContents, setFileContents] = useState(selectedWebCode);
+  const [fileContents, setFileContents] = useState(readFile(selectedWebCode));
 
   const brain = useRef({
     LeftBackDelta: 0,
@@ -269,7 +268,7 @@ export function Animate(connection) {
       uploadFile.text().then((content) => setFileContents(content));
     }
     function resetLoadedCode() {
-      setFileContents(fileContents.concat(' '))
+      setFileContents(fileContents.concat(' '));
     }
 
   }
