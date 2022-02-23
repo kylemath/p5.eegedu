@@ -7,6 +7,7 @@ import {
   Stack,
   Caption,
   Select,
+  ButtonGroup,
 } from "@shopify/polaris";
 import { zipSamples, MuseClient } from "muse-js";
 import { bandpassFilter, epoch, fft, powerByBand } from "@neurosity/pipes";
@@ -34,6 +35,7 @@ const animateSettings = {
 // these are from https://github.com/kylemath/p5.eegedu.art, saved from p5.eegedu
 const pathPrefix = 'https://raw.githubusercontent.com/kylemath/p5.eegedu.art/main/';
 const options = [
+  {label: 'Default', value: pathPrefix + 'Default.p5'},
   {label: 'BasicFrequencyBands', value: pathPrefix + 'BasicFrequencyBands.p5'},
   {label: 'AlphaSnake', value: pathPrefix + 'AlphaSnake.p5'},
   {label: '3dTorus', value: pathPrefix + '3dTorus.p5'},
@@ -41,7 +43,8 @@ const options = [
 ]
 
 export function Animate(connection) {
-  
+ // Main file in use
+
   //Uploading file
   const [uploadFile, setUploadFile] = useState();
   const handleDropZoneDrop = useCallback(
@@ -69,27 +72,29 @@ export function Animate(connection) {
 
   // Read file from web
   function readFile(value) {
-
     function reqListener () {
       setFileContents(this.responseText);
     }
-
     var oReq = new XMLHttpRequest();
     oReq.addEventListener("load", reqListener);
     oReq.open("GET", value);
     oReq.send();
   }
 
-  const [selectedWebCode, setSelectedWebCode] = useState(pathPrefix + 'BasicFrequencyBands.p5');
 
+  const [selectedWebCode, setSelectedWebCode] = useState(pathPrefix + 'Default.p5');  
   const handleSelectWebCodeChange = useCallback((value) =>
-    setSelectedWebCode(value),
+    {
+      setSelectedWebCode(value)
+      const text = readFile(value)
+      setFileContents(text);
+    },
     []
   );
 
-  // Main file in use
-  const [fileContents, setFileContents] = useState(readFile(selectedWebCode));
+  const [fileContents, setFileContents] = useState('//Load some code above \n render( <>Hello World</>)');
 
+  
   const brain = useRef({
     LeftBackDelta: 0,
     LeftBackTheta: 0,
@@ -123,7 +128,6 @@ export function Animate(connection) {
     museClient = new MuseClient();
     await museClient.connect();
     await museClient.start();
-
     return;
   }
 
@@ -200,7 +204,7 @@ export function Animate(connection) {
           noInline={true}
           theme={theme}
         >
-          <LivePreview />   
+    
          <Select
             label="Select Example Code"
             options={options}
@@ -208,18 +212,40 @@ export function Animate(connection) {
             value={selectedWebCode}
           />      
           <br />
-          <Button
-            onClick={() => {
-              resetLoadedCode();
-            }}
-            primary
-          >
-            {'Reset Code'}
-          </Button>
+
           <br />
+          <LivePreview /> 
+          <br />  
+          <ButtonGroup>
+
+            <Button
+              onClick={() => {
+                loadSelectedCode();
+              }}
+              primary
+            >
+              {'Reset Code'}
+            </Button>
+   {/*         <Button
+              onClick={() => {
+                copyCurrentCode();
+              }}
+              primary
+            >
+              {'Copy Current Code'}
+            </Button> */}           
+            <Button
+              onClick={() => {
+                runCurrentCode();
+              }}
+              primary
+            >
+              {'Restart Current Code'}
+            </Button>
+          </ButtonGroup>
           <LiveEditor id="liveEditor" />
           <Card.Section>
-            <LiveError />
+            {fileContents && <LiveError />}
           </Card.Section>
           <Card.Section>
             <TextField
@@ -267,9 +293,20 @@ export function Animate(connection) {
     function loadFile() {
       uploadFile.text().then((content) => setFileContents(content));
     }
-    function resetLoadedCode() {
-      setFileContents(fileContents.concat(' '));
+
+    function loadSelectedCode() {
+      const text = readFile(selectedWebCode)
+      setFileContents(text);
     }
+    // function copyCurrentCode() {
+    //   const text = document.getElementById("liveEditor").firstChild.value;
+    //   const copyToClipboard = navigator.clipboard.writeText(text)
+    //   console.log(copyToClipboard)
+    // }
+    function runCurrentCode() {
+      const text = document.getElementById("liveEditor").firstChild.value
+      setFileContents(text.concat(' '));
+    }    
 
   }
 
