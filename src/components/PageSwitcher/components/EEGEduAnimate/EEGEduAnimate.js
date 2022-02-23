@@ -194,11 +194,7 @@ export function Animate(connection) {
   function renderEditor() {
     const scope = { styled, brain, React, Sketch };
 
-
-
-    return (
-   
-  
+    return (  
         <LiveProvider
           code={fileContents}
           scope={scope}
@@ -212,6 +208,16 @@ export function Animate(connection) {
             onChange={handleSelectWebCodeChange}
             value={selectedWebCode}
           />      
+          <br />
+          <Button
+            onClick={() => {
+              resetLoadedCode();
+            }}
+            primary
+          >
+            {'Reset Code'}
+          </Button>
+          <br />
           <LiveEditor id="liveEditor" />
           <Card.Section>
             <LiveError />
@@ -262,6 +268,10 @@ export function Animate(connection) {
     function loadFile() {
       uploadFile.text().then((content) => setFileContents(content));
     }
+    function resetLoadedCode() {
+      setFileContents(fileContents.concat(' '))
+    }
+
   }
 
   return (
