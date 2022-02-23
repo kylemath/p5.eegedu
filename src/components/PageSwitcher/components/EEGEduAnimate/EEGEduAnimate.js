@@ -6,6 +6,7 @@ import {
   DropZone,
   Stack,
   Caption,
+  Select,
 } from "@shopify/polaris";
 import { zipSamples, MuseClient } from "muse-js";
 import { bandpassFilter, epoch, fft, powerByBand } from "@neurosity/pipes";
@@ -30,97 +31,19 @@ const animateSettings = {
   srate: 256,
 };
 
-const defaultEditorCode = `class MySketch extends React.Component {
- setup(p5, whereToPlot) {
-   p5.createCanvas(500, 500).parent(whereToPlot)
-   clickValue = 0;
- }
-
- draw(p5) {
-   p5.background(clickValue,255,200);
-
-   // You can set some useful variables
-   // to use more often like this:
-   // Notice how everything starts with p5.
-   HEIGHT = p5.height
-   WIDTH = p5.width;
-   MOUSEX = p5.mouseX;
-   MOUSEY = p5.mouseY;
-
-   // Availalable EEG Variables:
-   // Left, Right
-   // Front, Back
-   // Delta, Theta, Alpha, Beta, Gamma
-   // e.g.:
-   DELTA = brain.current.LeftBackDelta;
-   THETA = brain.current.LeftBackTheta;
-   ALPHA = brain.current.LeftBackAlpha;   
-   BETA =  brain.current.LeftBackBeta;
-   GAMMA =  brain.current.LeftBackGamma;
-   
-   gap = (DELTA + THETA + ALPHA + BETA + GAMMA)/5;
-   
-   p5.textSize(DELTA);
-   p5.fill(clickValue,DELTA*5,20);
-   p5.text('Delta', MOUSEX+40, MOUSEY-(2*gap));
-   p5.ellipse(MOUSEX,MOUSEY-(2*gap),DELTA);
-
-   p5.textSize(THETA);
-   p5.fill(20, clickValue, THETA*5);
-   p5.text('Theta', MOUSEX+40, MOUSEY-(1*gap));
-   p5.ellipse(MOUSEX,MOUSEY-(1*gap),THETA);
-
-   p5.textSize(ALPHA);
-   p5.fill(ALPHA*5, clickValue, clickValue);
-   p5.text('Alpha', MOUSEX+40, MOUSEY);   
-   p5.ellipse(MOUSEX,MOUSEY,ALPHA);
-
-   p5.textSize(BETA);
-   p5.fill(BETA*5, clickValue, BETA*5);
-   p5.text('Beta', MOUSEX+40, MOUSEY+(1*gap));   
-   p5.ellipse(MOUSEX,MOUSEY+(1*gap),BETA);
-
-   p5.textSize(GAMMA);
-   p5.fill(clickValue, GAMMA*5/2, GAMMA*5);
-   p5.text('Gamma', MOUSEX+40, MOUSEY+(2*gap));   
-   p5.ellipse(MOUSEX,MOUSEY+(2*gap),GAMMA);
-      
- }
-
- // other p5 functions can be created like this
- // but must be included below in the return call
- mouseClicked(p5) {
-   p5.background(200,255,210)
-   if (clickValue === 0) {
-     clickValue = 255;
-     } else {
-     clickValue = 0;
-     }
- }
-
- render() {
-   return (
-      <Sketch
-        setup={this.setup}
-        draw={this.draw}
-        mouseClicked={this.mouseClicked}
-      />
-   )
- }
-
-}
-
-render (
- <MySketch />
-)
-
-`;
+// these are from https://github.com/kylemath/p5.eegedu.art, saved from p5.eegedu
+const pathPrefix = 'https://raw.githubusercontent.com/kylemath/p5.eegedu.art/main/';
+const options = [
+  {label: 'BasicFrequencyBands', value: pathPrefix + 'BasicFrequencyBands.p5'},
+  {label: 'AlphaSnake', value: pathPrefix + 'AlphaSnake.p5'},
+  {label: '3dTorus', value: pathPrefix + '3dTorus.p5'},
+  {label: 'SplineBounce', value: pathPrefix + 'SplineBounce.p5'}
+]
 
 export function Animate(connection) {
+  
+  //Uploading file
   const [uploadFile, setUploadFile] = useState();
-  const [fileName, setFileName] = useState("MySketch.p5");
-  const [fileContents, setFileContents] = useState(defaultEditorCode);
-
   const handleDropZoneDrop = useCallback(
     (_dropFiles, acceptedFiles, _rejectedFiles) => {
       setUploadFile(acceptedFiles[0]);
@@ -137,10 +60,36 @@ export function Animate(connection) {
     </Stack>
   );
 
+  // Saving File
+  const [fileName, setFileName] = useState("MySketch.p5");
   const handleFilenameChange = useCallback(
     (newValue) => setFileName(newValue),
     []
   );
+
+  // Read file from web
+  function readFile(value) {
+
+    function reqListener () {
+      setFileContents(this.responseText);
+    }
+
+    var oReq = new XMLHttpRequest();
+    oReq.addEventListener("load", reqListener);
+    oReq.open("GET", value);
+    oReq.send();
+  }
+
+  const [selectedWebCode, setSelectedWebCode] = useState(pathPrefix + 'BasicFrequencyBands.p5');
+
+  const handleSelectWebCodeChange = useCallback((value) =>
+    setSelectedWebCode(value),
+    readFile(selectedWebCode),
+    []
+  );
+
+  // Main file in use
+  const [fileContents, setFileContents] = useState(selectedWebCode);
 
   const brain = useRef({
     LeftBackDelta: 0,
@@ -245,52 +194,64 @@ export function Animate(connection) {
   function renderEditor() {
     const scope = { styled, brain, React, Sketch };
 
+
+
     return (
-      <LiveProvider
-        code={fileContents}
-        scope={scope}
-        noInline={true}
-        theme={theme}
-      >
-        <LivePreview />
-        <LiveEditor id="liveEditor" />
-        <Card.Section>
-          <LiveError />
-        </Card.Section>
-        <Card.Section>
-          <TextField
-            label="Filename:"
-            value={fileName}
-            onChange={handleFilenameChange}
-            autoComplete="off"
-          />
-          <br />
-          <Button
-            onClick={() => {
-              saveFile();
-            }}
-            primary
-          >
-            {"Save code to text file"}
-          </Button>
-        </Card.Section>
-        <Card.Section>
-          <DropZone allowMultiple={false} onDrop={handleDropZoneDrop}>
-            {uploadFileDescription}
-            {fileUpload}
-          </DropZone>
-          <br />
-          <Button
-            onClick={() => {
-              loadFile();
-            }}
-            primary
-            disabled={!uploadFile}
-          >
-            {"Load code from text file"}
-          </Button>
-        </Card.Section>
-      </LiveProvider>
+   
+  
+        <LiveProvider
+          code={fileContents}
+          scope={scope}
+          noInline={true}
+          theme={theme}
+        >
+          <LivePreview />   
+         <Select
+            label="Select Example Code"
+            options={options}
+            onChange={handleSelectWebCodeChange}
+            value={selectedWebCode}
+          />      
+          <LiveEditor id="liveEditor" />
+          <Card.Section>
+            <LiveError />
+          </Card.Section>
+          <Card.Section>
+            <TextField
+              label="Filename:"
+              value={fileName}
+              onChange={handleFilenameChange}
+              autoComplete="off"
+            />
+            <br />
+            <Button
+              onClick={() => {
+                saveFile();
+              }}
+              primary
+            >
+              {"Save code to text file"}
+            </Button>
+          </Card.Section>
+          <Card.Section>
+            <DropZone allowMultiple={false} onDrop={handleDropZoneDrop}>
+              {uploadFileDescription}
+              {fileUpload}
+            </DropZone>
+            <br />
+            <Button
+              onClick={() => {
+                loadFile();
+              }}
+              primary
+              disabled={!uploadFile}
+            >
+              {"Load code from text file"}
+            </Button>
+
+          </Card.Section>
+        </LiveProvider>
+
     );
 
     function saveFile() {
@@ -304,7 +265,7 @@ export function Animate(connection) {
   }
 
   return (
-    <Card title="Animate your brain waves">
+    <Card title="Animate your brain waves"> 
       <Card.Section>
         <p>
           The live animation is controlled by the P5.js code below. The code is
