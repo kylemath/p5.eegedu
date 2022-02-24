@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import {
   Card,
   Button,
@@ -39,6 +39,7 @@ export function Animate(connection) {
   function readRepoList(value) {
     function reqListener () {
       setRepoContents(this.responseText);
+      console.log('ding')
     }
     var oReq = new XMLHttpRequest();
     oReq.addEventListener("load", reqListener);
@@ -55,7 +56,10 @@ export function Animate(connection) {
   ]
 
   //this currently happens too often, every time main page is updated, not sure how to move outside to only run once, without button
-  readRepoList(address)
+  useEffect(()=>{
+    readRepoList(address)
+  }, []) // <-- empty dependency array
+
 
   if (repoContents) {
     const repoObj = JSON.parse(repoContents)
