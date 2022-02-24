@@ -50,9 +50,7 @@ export function Animate(connection) {
 
   const pathPrefix = 'https://raw.githubusercontent.com/kylemath/p5.eegedu.art/main/';
   const address = 'https://api.github.com/repos/kylemath/p5.eegedu.art/git/trees/main?recursive=1';
-  let options = [
-  {label: 'Default.p5', value: pathPrefix + 'Default.p5'}
-  ]
+  let options = [];
 
   useEffect(()=>{
     readRepoList(address)
@@ -62,8 +60,7 @@ export function Animate(connection) {
     const repoObj = JSON.parse(repoContents)
 
     for (let i = 0; i < repoObj.tree.length; i++) {
-        if (repoObj.tree[i].path.charAt(repoObj.tree[i].path.length-1) === '5' &&
-            repoObj.tree[i].path !== 'Default.p5') 
+        if (repoObj.tree[i].path.charAt(repoObj.tree[i].path.length-1) === '5') 
         {
           options.push({
             label: repoObj.tree[i].path, 
@@ -111,18 +108,23 @@ export function Animate(connection) {
   }
 
 
-  const [selectedWebCode, setSelectedWebCode] = useState(pathPrefix + 'Default.p5');  
+  const [selectedWebCode, setSelectedWebCode] = useState(pathPrefix + 'BasicFrequencyBands.p5');  
   const handleSelectWebCodeChange = useCallback((value) =>
     {
       setSelectedWebCode(value)
-      const text = readFile(value)
-      setFileContents(text);
+      readFile(value)
     },
     []
   );
 
  // Main file in use
-  const [fileContents, setFileContents] = useState('//Load some code above \n render( <>Hello World</>)');
+  const [fileContents, setFileContents] = useState();
+
+  // Load in file for first time
+  useEffect(()=>{
+    readFile(pathPrefix + 'BasicFrequencyBands.p5')
+  }, []) // <-- empty dependency array
+
 
   const brain = useRef({
     LeftBackDelta: 0,
