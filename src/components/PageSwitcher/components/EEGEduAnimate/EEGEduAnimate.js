@@ -53,6 +53,8 @@ export function Animate(connection) {
   let options = [
   {label: 'Default.p5', value: pathPrefix + 'Default.p5'}
   ]
+
+  //this currently happens too often, every time main page is updated, not sure how to move outside to only run once, without button
   readRepoList(address)
 
   if (repoContents) {
