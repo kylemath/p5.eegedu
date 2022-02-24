@@ -149,80 +149,85 @@ export function Animate(connection) {
     textMsg: "No data.",
   });
 
-  let channelData$;
-  let pipeBands$;
-  let multicastBands$;
-  let museClient;
+  // Wrap this whole thing in useEffect to control when it updates
+  // it only updates when dependencies are changed, which in this case is just [connection]
+  useEffect(() => {
 
-  async function connectMuse() {
-    museClient = new MuseClient();
-    await museClient.connect();
-    await museClient.start();
-    return;
-  }
+    let channelData$;
+    let pipeBands$;
+    let multicastBands$;
+    let museClient;   
 
-  async function buildBrain() {
-    if (connection.status.connected) {
-      if (connection.status.type === "mock") {
-        channelData$ = mockMuseEEG(256);
-      } else {
-        await connectMuse();
-        channelData$ = museClient.eegReadings;
-      }
-
-      pipeBands$ = zipSamples(channelData$).pipe(
-        bandpassFilter({
-          cutoffFrequencies: [
-            animateSettings.cutOffLow,
-            animateSettings.cutOffHigh,
-          ],
-          nbChannels: animateSettings.nbChannels,
-        }),
-        epoch({
-          duration: animateSettings.duration,
-          interval: animateSettings.interval,
-          samplingRate: animateSettings.srate,
-        }),
-        fft({ bins: animateSettings.bins }),
-        powerByBand(),
-        catchError((err) => {
-          console.log(err);
-        })
-      );
-
-      multicastBands$ = pipeBands$.pipe(multicast(() => new Subject()));
-
-      multicastBands$.subscribe((data) => {
-        brain.current = {
-          LeftBackDelta: 10 * data.delta[0],
-          LeftBackTheta: 10 * data.theta[0],
-          LeftBackAlpha: 10 * data.alpha[0],
-          LeftBackBeta: 10 * data.beta[0],
-          LeftBackGamma: 10 * data.gamma[0],
-          LeftFrontDelta: 10 * data.delta[1],
-          LeftFrontTheta: 10 * data.theta[1],
-          LeftFrontAlpha: 10 * data.alpha[1],
-          LeftFrontBeta: 10 * data.beta[1],
-          LeftFrontGamma: 10 * data.gamma[1],
-          RightFrontDelta: 10 * data.delta[2],
-          RightFrontTheta: 10 * data.theta[2],
-          RightFrontAlpha: 10 * data.alpha[2],
-          RightFrontBeta: 10 * data.beta[2],
-          RightFrontGamma: 10 * data.gamma[2],
-          RightBackDelta: 10 * data.delta[3],
-          RightBackTheta: 10 * data.theta[3],
-          RightBackAlpha: 10 * data.alpha[3],
-          RightBackBeta: 10 * data.beta[3],
-          RightBackGamma: 10 * data.gamma[3],
-          textMsg: "Data received",
-        };
-      });
-
-      multicastBands$.connect();
+    const connectMuse = async() => {
+      console.log('dingdong')
+      museClient = new MuseClient();
+      await museClient.connect();
+      await museClient.start();
+      return;
     }
-  }
 
-  buildBrain();
+    const buildBrain = async() => {
+      if (connection.status.connected) {
+        if (connection.status.type === "mock") {
+          channelData$ = mockMuseEEG(256);
+        } else {
+          await connectMuse();
+          channelData$ = museClient.eegReadings;
+        }
+
+        pipeBands$ = zipSamples(channelData$).pipe(
+          bandpassFilter({
+            cutoffFrequencies: [
+              animateSettings.cutOffLow,
+              animateSettings.cutOffHigh,
+            ],
+            nbChannels: animateSettings.nbChannels,
+          }),
+          epoch({
+            duration: animateSettings.duration,
+            interval: animateSettings.interval,
+            samplingRate: animateSettings.srate,
+          }),
+          fft({ bins: animateSettings.bins }),
+          powerByBand(),
+          catchError((err) => {
+            console.log(err);
+          })
+        );
+
+        multicastBands$ = pipeBands$.pipe(multicast(() => new Subject()));
+
+        multicastBands$.subscribe((data) => {
+          brain.current = {
+            LeftBackDelta: 10 * data.delta[0],
+            LeftBackTheta: 10 * data.theta[0],
+            LeftBackAlpha: 10 * data.alpha[0],
+            LeftBackBeta: 10 * data.beta[0],
+            LeftBackGamma: 10 * data.gamma[0],
+            LeftFrontDelta: 10 * data.delta[1],
+            LeftFrontTheta: 10 * data.theta[1],
+            LeftFrontAlpha: 10 * data.alpha[1],
+            LeftFrontBeta: 10 * data.beta[1],
+            LeftFrontGamma: 10 * data.gamma[1],
+            RightFrontDelta: 10 * data.delta[2],
+            RightFrontTheta: 10 * data.theta[2],
+            RightFrontAlpha: 10 * data.alpha[2],
+            RightFrontBeta: 10 * data.beta[2],
+            RightFrontGamma: 10 * data.gamma[2],
+            RightBackDelta: 10 * data.delta[3],
+            RightBackTheta: 10 * data.theta[3],
+            RightBackAlpha: 10 * data.alpha[3],
+            RightBackBeta: 10 * data.beta[3],
+            RightBackGamma: 10 * data.gamma[3],
+            textMsg: "Data received",
+          };
+        });
+
+        multicastBands$.connect();
+      }
+    }
+    buildBrain();
+  }, [connection])
 
   function renderEditor() {
     const scope = { styled, brain, React, Sketch };
