@@ -34,42 +34,42 @@ const animateSettings = {
 
 export function Animate(connection) {
 
-// Populate Select file list from github repo .art
+  // Populate Select file list from github repo .art
 
-function readRepoList(value) {
-  function reqListener () {
-    setRepoContents(this.responseText);
-  }
-  var oReq = new XMLHttpRequest();
-  oReq.addEventListener("load", reqListener);
-  oReq.open("GET", value);
-  oReq.send();
-}
-
-const [repoContents, setRepoContents] = useState();
-
-const pathPrefix = 'https://raw.githubusercontent.com/kylemath/p5.eegedu.art/main/';
-const address = 'https://api.github.com/repos/kylemath/p5.eegedu.art/git/trees/main?recursive=1';
-let options = [
-{label: 'Default.p5', value: pathPrefix + 'Default.p5'}
-]
-readRepoList(address)
-
-if (repoContents) {
-  const repoObj = JSON.parse(repoContents)
-
-  for (let i = 0; i < repoObj.tree.length; i++) {
-      if (repoObj.tree[i].path.charAt(repoObj.tree[i].path.length-1) === '5' &&
-          repoObj.tree[i].path !== 'Default.p5') 
-      {
-        options.push({
-          label: repoObj.tree[i].path, 
-          value: pathPrefix + repoObj.tree[i].path
-        })
-      }
+  function readRepoList(value) {
+    function reqListener () {
+      setRepoContents(this.responseText);
+    }
+    var oReq = new XMLHttpRequest();
+    oReq.addEventListener("load", reqListener);
+    oReq.open("GET", value);
+    oReq.send();
   }
 
-}
+  const [repoContents, setRepoContents] = useState();
+
+  const pathPrefix = 'https://raw.githubusercontent.com/kylemath/p5.eegedu.art/main/';
+  const address = 'https://api.github.com/repos/kylemath/p5.eegedu.art/git/trees/main?recursive=1';
+  let options = [
+  {label: 'Default.p5', value: pathPrefix + 'Default.p5'}
+  ]
+  readRepoList(address)
+
+  if (repoContents) {
+    const repoObj = JSON.parse(repoContents)
+
+    for (let i = 0; i < repoObj.tree.length; i++) {
+        if (repoObj.tree[i].path.charAt(repoObj.tree[i].path.length-1) === '5' &&
+            repoObj.tree[i].path !== 'Default.p5') 
+        {
+          options.push({
+            label: repoObj.tree[i].path, 
+            value: pathPrefix + repoObj.tree[i].path
+          })
+        }
+    }
+
+  }
 
   //Uploading file
   const [uploadFile, setUploadFile] = useState();
