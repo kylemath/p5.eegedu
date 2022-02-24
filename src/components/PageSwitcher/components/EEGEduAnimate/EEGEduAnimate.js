@@ -32,18 +32,43 @@ const animateSettings = {
   srate: 256,
 };
 
-// these are from https://github.com/kylemath/p5.eegedu.art, saved from p5.eegedu
-const pathPrefix = 'https://raw.githubusercontent.com/kylemath/p5.eegedu.art/main/';
-const options = [
-  {label: 'Default', value: pathPrefix + 'Default.p5'},
-  {label: 'BasicFrequencyBands', value: pathPrefix + 'BasicFrequencyBands.p5'},
-  {label: 'AlphaSnake', value: pathPrefix + 'AlphaSnake.p5'},
-  {label: '3dTorus', value: pathPrefix + '3dTorus.p5'},
-  {label: 'SplineBounce', value: pathPrefix + 'SplineBounce.p5'}
-]
-
 export function Animate(connection) {
- // Main file in use
+
+// Read file from web
+function readRepoList(value) {
+  function reqListener () {
+    setRepoContents(this.responseText);
+  }
+  var oReq = new XMLHttpRequest();
+  oReq.addEventListener("load", reqListener);
+  oReq.open("GET", value);
+  oReq.send();
+}
+
+const [repoContents, setRepoContents] = useState();
+
+const pathPrefix = 'https://raw.githubusercontent.com/kylemath/p5.eegedu.art/main/';
+const address = 'https://api.github.com/repos/kylemath/p5.eegedu.art/git/trees/main?recursive=1';
+let options = [
+{label: 'Default.p5', value: pathPrefix + 'Default.p5'}
+]
+readRepoList(address)
+
+if (repoContents) {
+  const repoObj = JSON.parse(repoContents)
+
+  for (let i = 0; i < repoObj.tree.length; i++) {
+      if (repoObj.tree[i].path.charAt(repoObj.tree[i].path.length-1) === '5' &&
+          repoObj.tree[i].path !== 'Default.p5') 
+      {
+        options.push({
+          label: repoObj.tree[i].path, 
+          value: pathPrefix + repoObj.tree[i].path
+        })
+      }
+  }
+
+}
 
   //Uploading file
   const [uploadFile, setUploadFile] = useState();
@@ -92,9 +117,9 @@ export function Animate(connection) {
     []
   );
 
+ // Main file in use
   const [fileContents, setFileContents] = useState('//Load some code above \n render( <>Hello World</>)');
 
-  
   const brain = useRef({
     LeftBackDelta: 0,
     LeftBackTheta: 0,
