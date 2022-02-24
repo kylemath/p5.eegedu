@@ -107,7 +107,6 @@ export function Animate(connection) {
     oReq.send();
   }
 
-
   const [selectedWebCode, setSelectedWebCode] = useState(pathPrefix + 'BasicFrequencyBands.p5');  
   const handleSelectWebCodeChange = useCallback((value) =>
     {
@@ -251,28 +250,20 @@ export function Animate(connection) {
 
             <Button
               onClick={() => {
-                loadSelectedCode();
+                resetSelectedCode();
               }}
               primary
             >
               {'Reset Code'}
-            </Button>
-   {/*         <Button
-              onClick={() => {
-                copyCurrentCode();
-              }}
-              primary
-            >
-              {'Copy Current Code'}
-            </Button> */}           
+            </Button>     
             <Button
               onClick={() => {
-                runCurrentCode();
+                restartCurrentCode();
               }}
               primary
             >
               {'Restart Current Code'}
-            </Button>
+            </Button>  
           </ButtonGroup>
           <LiveEditor id="liveEditor" />
           <Card.Section>
@@ -325,20 +316,13 @@ export function Animate(connection) {
       uploadFile.text().then((content) => setFileContents(content));
     }
 
-    function loadSelectedCode() {
-      const text = readFile(selectedWebCode)
-      setFileContents(text);
+    function resetSelectedCode() {
+      readFile(selectedWebCode)
     }
-    // function copyCurrentCode() {
-    //   const text = document.getElementById("liveEditor").firstChild.value;
-    //   const copyToClipboard = navigator.clipboard.writeText(text)
-    //   console.log(copyToClipboard)
-    // }
-    function runCurrentCode() {
+    function restartCurrentCode() {
       const text = document.getElementById("liveEditor").firstChild.value
       setFileContents(text.concat(' '));
-    }    
-
+    }  
   }
 
   return (
