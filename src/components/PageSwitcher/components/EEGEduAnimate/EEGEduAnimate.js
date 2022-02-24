@@ -34,7 +34,8 @@ const animateSettings = {
 
 export function Animate(connection) {
 
-// Read file from web
+// Populate Select file list from github repo .art
+
 function readRepoList(value) {
   function reqListener () {
     setRepoContents(this.responseText);
