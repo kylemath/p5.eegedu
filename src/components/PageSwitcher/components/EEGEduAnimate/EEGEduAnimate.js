@@ -50,9 +50,7 @@ export function Animate(connection) {
 
   const pathPrefix = 'https://raw.githubusercontent.com/kylemath/p5.eegedu.art/main/';
   const address = 'https://api.github.com/repos/kylemath/p5.eegedu.art/git/trees/main?recursive=1';
-  let options = [
-  {label: 'Default.p5', value: pathPrefix + 'Default.p5'}
-  ]
+  let options = [];
 
   useEffect(()=>{
     readRepoList(address)
@@ -62,8 +60,7 @@ export function Animate(connection) {
     const repoObj = JSON.parse(repoContents)
 
     for (let i = 0; i < repoObj.tree.length; i++) {
-        if (repoObj.tree[i].path.charAt(repoObj.tree[i].path.length-1) === '5' &&
-            repoObj.tree[i].path !== 'Default.p5') 
+        if (repoObj.tree[i].path.charAt(repoObj.tree[i].path.length-1) === '5') 
         {
           options.push({
             label: repoObj.tree[i].path, 
@@ -110,19 +107,23 @@ export function Animate(connection) {
     oReq.send();
   }
 
-
-  const [selectedWebCode, setSelectedWebCode] = useState(pathPrefix + 'Default.p5');  
+  const [selectedWebCode, setSelectedWebCode] = useState(pathPrefix + 'BasicFrequencyBands.p5');  
   const handleSelectWebCodeChange = useCallback((value) =>
     {
       setSelectedWebCode(value)
-      const text = readFile(value)
-      setFileContents(text);
+      readFile(value)
     },
     []
   );
 
  // Main file in use
-  const [fileContents, setFileContents] = useState('//Load some code above \n render( <>Hello World</>)');
+  const [fileContents, setFileContents] = useState();
+
+  // Load in file for first time
+  useEffect(()=>{
+    readFile(pathPrefix + 'BasicFrequencyBands.p5')
+  }, []) // <-- empty dependency array
+
 
   const brain = useRef({
     LeftBackDelta: 0,
@@ -249,28 +250,20 @@ export function Animate(connection) {
 
             <Button
               onClick={() => {
-                loadSelectedCode();
+                resetSelectedCode();
               }}
               primary
             >
               {'Reset Code'}
-            </Button>
-   {/*         <Button
-              onClick={() => {
-                copyCurrentCode();
-              }}
-              primary
-            >
-              {'Copy Current Code'}
-            </Button> */}           
+            </Button>     
             <Button
               onClick={() => {
-                runCurrentCode();
+                restartCurrentCode();
               }}
               primary
             >
               {'Restart Current Code'}
-            </Button>
+            </Button>  
           </ButtonGroup>
           <LiveEditor id="liveEditor" />
           <Card.Section>
@@ -323,20 +316,13 @@ export function Animate(connection) {
       uploadFile.text().then((content) => setFileContents(content));
     }
 
-    function loadSelectedCode() {
-      const text = readFile(selectedWebCode)
-      setFileContents(text);
+    function resetSelectedCode() {
+      readFile(selectedWebCode)
     }
-    // function copyCurrentCode() {
-    //   const text = document.getElementById("liveEditor").firstChild.value;
-    //   const copyToClipboard = navigator.clipboard.writeText(text)
-    //   console.log(copyToClipboard)
-    // }
-    function runCurrentCode() {
+    function restartCurrentCode() {
       const text = document.getElementById("liveEditor").firstChild.value
       setFileContents(text.concat(' '));
-    }    
-
+    }  
   }
 
   return (
