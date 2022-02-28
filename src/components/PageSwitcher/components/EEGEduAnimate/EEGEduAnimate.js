@@ -8,6 +8,7 @@ import {
   Caption,
   Select,
   ButtonGroup,
+  Link,
 } from "@shopify/polaris";
 import { zipSamples, MuseClient } from "muse-js";
 import { bandpassFilter, epoch, fft, powerByBand } from "@neurosity/pipes";
@@ -290,7 +291,19 @@ export function Animate(connection) {
             >
               {"Save code to text file"}
             </Button>
+         
           </Card.Section>
+             <p>
+                {
+                  'The examples above are all stored in a '
+                }
+                <Link url="https://github.com/kylemath/p5.eegedu.art/" external={true}> 
+                   public repository 
+                </Link>
+                {[
+                '. You can save your .p5 code and submit your artwork as code to the repository.',
+                ]}
+              </p>             
           <Card.Section>
             <DropZone allowMultiple={false} onDrop={handleDropZoneDrop}>
               {uploadFileDescription}
@@ -334,11 +347,26 @@ export function Animate(connection) {
     <Card title="Animate your brain waves"> 
       <Card.Section>
         <p>
-          The live animation is controlled by the P5.js code below. The code is
-          editable. Play around with the numbers and see what happens. The
-          brain.current variables are only available if there is a data source
-          connected. EEG bands and locations are available by calling
-          brain.current.RightFrontAlpha
+        {[
+          'The live animation is controlled by the P5.js code below. The code is',
+          'editable. Play around with the numbers and see what happens. The',
+          'brain.current variables are only available if there is a data source',
+          'connected. EEG bands and locations are available by calling',
+          'brain.current.RightFrontAlpha',
+        ]}
+        </p>
+        <br />
+        <p>
+          {
+            'The examples below are all stored in a '
+          }
+          <Link url="https://github.com/kylemath/p5.eegedu.art/" external={true}> 
+             public repository 
+          </Link>
+          {[
+          '. You can save your .p5 code with a button at the bottom of the page.',
+          'You can then submit your artwork as code to the repository.',
+          ]}
         </p>
       </Card.Section>
       <Card.Section>
