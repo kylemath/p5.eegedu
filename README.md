@@ -69,13 +69,13 @@ The guide for contributors can be found [here](https://github.com/kylemath/EEGEd
 
 # References
 
-* ![Muse JS Library](https://github.com/urish/muse-js)
-* ![Muse EEG Explorer Live Demo](https://github.com/NeuroJS/angular-muse)
-* ![Muse EEG Frequency Domain Data - starting point](https://github.com/tanvach/muse-fft)
-* ![Easy pipable operations on eeg data from muse-js](https://github.com/neurosity/eeg-pipes)
-* ![React JS Web Development](https://reactjs.org/)
-* ![Interactive Charts](https://www.chartjs.org/docs/latest/)
-* ![Muse LSL](https://github.com/urish/muse-lsl)
+* [Muse JS Library](https://github.com/urish/muse-js)
+* [Muse EEG Explorer Live Demo](https://github.com/NeuroJS/angular-muse)
+* [Muse EEG Frequency Domain Data - starting point](https://github.com/tanvach/muse-fft)
+* [Easy pipable operations on eeg data from muse-js](https://github.com/neurosity/eeg-pipes)
+* [React JS Web Development](https://reactjs.org/)
+* [Interactive Charts](https://www.chartjs.org/docs/latest/)
+* [Muse LSL](https://github.com/urish/muse-lsl)
 
 # Credits
 
