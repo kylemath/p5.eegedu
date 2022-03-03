@@ -240,20 +240,21 @@ export function Animate(connection) {
           noInline={true}
           theme={theme}
         >
-    
          <Select
             label="Select Example Code"
             options={options}
             onChange={handleSelectWebCodeChange}
             value={selectedWebCode}
           />      
-          <br />
 
           <br />
-          <LivePreview /> 
-          <br />  
+
+          <LiveEditor id="liveEditor" />
+            {fileContents && <LiveError />}
+
+
+          {fileContents && <LivePreview />} 
           <ButtonGroup>
-
             <Button
               onClick={() => {
                 resetSelectedCode();
@@ -270,11 +271,7 @@ export function Animate(connection) {
             >
               {'Restart Current Code'}
             </Button>  
-          </ButtonGroup>
-          <LiveEditor id="liveEditor" />
-          <Card.Section>
-            {fileContents && <LiveError />}
-          </Card.Section>
+          </ButtonGroup>  
           <Card.Section>
             <TextField
               label="Filename:"
@@ -348,11 +345,11 @@ export function Animate(connection) {
       <Card.Section>
         <p>
         {[
-          'The live animation is controlled by the P5.js code below. The code is',
+          'The live animation is controlled by the P5.js code below. The code is ',
           'editable. Play around with the numbers and see what happens. The',
           'brain.current variables are only available if there is a data source',
-          'connected. EEG bands and locations are available by calling',
-          'brain.current.RightFrontAlpha',
+          'connected. EEG bands and locations are available by calling ' ,
+          'brain.current.RightFrontAlpha, for example.',
         ]}
         </p>
         <br />
