@@ -314,7 +314,7 @@ export function Animate(connection) {
               primary
               disabled={!uploadFile}
             >
-              {"Load code from text file"}
+              {"Load code from added file"}
             </Button>
 
           </Card.Section>
