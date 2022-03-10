@@ -11,7 +11,7 @@ import {
   Link,
 } from "@shopify/polaris";
 import { zipSamples, MuseClient } from "muse-js";
-import { bandpassFilter, epoch, fft, powerByBand } from "@neurosity/pipes";
+import { bandpassFilter, epoch, fft, powerByBand, sliceFFT } from "@neurosity/pipes";
 import { catchError, multicast } from "rxjs/operators";
 import { Subject } from "rxjs";
 import Sketch from "react-p5";
@@ -99,6 +99,7 @@ export function Animate(connection) {
 
   // Read file from web
   function readFile(value) {
+    console.log('reading file')
     function reqListener () {
       setFileContents(this.responseText);
     }
@@ -125,6 +126,7 @@ export function Animate(connection) {
     readFile(pathPrefix + 'BasicFrequencyBands.p5')
   }, []) // <-- empty dependency array
 
+  const pipeline = 'bands';
 
   const brain = useRef({
     data: {delta:[], theta:[], alpha:[], beta:[], gamma:[]},
@@ -137,6 +139,7 @@ export function Animate(connection) {
 
     let channelData$;
     let pipeBands$;
+    let pipeSpectra$
     let multicastBands$;
     let museClient;   
 
@@ -177,19 +180,50 @@ export function Animate(connection) {
           })
         );
 
-        multicastBands$ = pipeBands$.pipe(multicast(() => new Subject()));
+        pipeSpectra$ = zipSamples(channelData$).pipe(
+          bandpassFilter({
+            cutoffFrequencies: [
+              animateSettings.cutOffLow,
+              animateSettings.cutOffHigh,
+            ],
+            nbChannels: animateSettings.nbChannels,
+          }),
+          epoch({
+            duration: animateSettings.duration,
+            interval: animateSettings.interval,
+            samplingRate: animateSettings.srate,
+          }),
+          fft({ bins: animateSettings.bins }),
+          sliceFFT([1, 128]),
+          catchError((err) => {
+            console.log(err);
+          })
+        );    
+
+        if (pipeline === 'bands') {
+
+          multicastBands$ = pipeBands$.pipe(multicast(() => new Subject()));
+
+        } else if (pipeline === 'spectra') {
+
+          multicastBands$ = pipeSpectra$.pipe(multicast(() => new Subject()));
+      
+        }
 
         multicastBands$.subscribe((data) => {
+          console.log(data)
           brain.current = {
             data: data,
             textMsg: "Data received",
-          };
+          }; 
         });
 
         multicastBands$.connect();
       }
     }
+
     buildBrain();
+
   }, [connection])
 
   function renderEditor() {
