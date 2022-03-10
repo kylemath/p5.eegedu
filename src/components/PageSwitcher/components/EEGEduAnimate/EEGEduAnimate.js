@@ -99,6 +99,7 @@ export function Animate(connection) {
 
   // Read file from web
   function readFile(value) {
+    console.log('reading file')
     function reqListener () {
       setFileContents(this.responseText);
     }
@@ -125,7 +126,7 @@ export function Animate(connection) {
     readFile(pathPrefix + 'BasicFrequencyBands.p5')
   }, []) // <-- empty dependency array
 
-  const pipeline = 'spectra';
+  const pipeline = 'bands';
 
   const brain = useRef({
     data: {},
@@ -159,7 +160,7 @@ export function Animate(connection) {
           channelData$ = museClient.eegReadings;
         }
 
-       pipeBands$ = zipSamples(channelData$).pipe(
+        pipeBands$ = zipSamples(channelData$).pipe(
           bandpassFilter({
             cutoffFrequencies: [
               animateSettings.cutOffLow,
@@ -193,23 +194,24 @@ export function Animate(connection) {
             samplingRate: animateSettings.srate,
           }),
           fft({ bins: animateSettings.bins }),
-          sliceFFT([1, 100]),
+          sliceFFT([1, 60]),
           catchError((err) => {
             console.log(err);
           })
-        );  
+        );    
 
         if (pipeline === 'bands') {
- 
+
           multicastBands$ = pipeBands$.pipe(multicast(() => new Subject()));
 
         } else if (pipeline === 'spectra') {
-  
+
           multicastBands$ = pipeSpectra$.pipe(multicast(() => new Subject()));
       
         }
 
         multicastBands$.subscribe((data) => {
+          console.log(data)
           brain.current = {
             data: data,
             textMsg: "Data received",
