@@ -126,7 +126,7 @@ export function Animate(connection) {
     readFile(pathPrefix + 'BasicFrequencyBands.p5')
   }, []) // <-- empty dependency array
 
-  const pipeline = 'spectra';
+  const pipeline = 'bands';
 
   const brain = useRef({
     data: {delta:[], theta:[], alpha:[], beta:[], gamma:[]},
