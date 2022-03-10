@@ -128,36 +128,9 @@ export function Animate(connection) {
   const pipeline = 'spectra';
 
   const brain = useRef({
-      LeftBackDelta: 0,
-      LeftBackTheta: 0,
-      LeftBackAlpha: 0,
-      LeftBackBeta: 0,
-      LeftBackGamma: 0,
-      LeftFrontDelta: 0,
-      LeftFrontTheta: 0,
-      LeftFrontAlpha: 0,
-      LeftFrontBeta: 0,
-      LeftFrontGamma: 0,
-      RightFrontDelta: 0,
-      RightFrontTheta: 0,
-      RightFrontAlpha: 0,
-      RightFrontBeta: 0,
-      RightFrontGamma: 0,
-      RightBackDelta: 0,
-      RightBackTheta: 0,
-      RightBackAlpha: 0,
-      RightBackBeta: 0,
-      RightBackGamma: 0,
-      textMsg: "No data.",
-    });
-  const brainSpectra = useRef({
-    LeftBackSpectra: 0,
-    LeftFrontSpectra: 0,
-    RightFrontSpectra: 0,
-    RightBackSpectra: 0,
+    data: {},
     textMsg: "No data.",
-  });  
-
+  });
 
   // Wrap this whole thing in useEffect to control when it updates
   // it only updates when dependencies are changed, which in this case is just [connection]
@@ -186,92 +159,61 @@ export function Animate(connection) {
           channelData$ = museClient.eegReadings;
         }
 
+       pipeBands$ = zipSamples(channelData$).pipe(
+          bandpassFilter({
+            cutoffFrequencies: [
+              animateSettings.cutOffLow,
+              animateSettings.cutOffHigh,
+            ],
+            nbChannels: animateSettings.nbChannels,
+          }),
+          epoch({
+            duration: animateSettings.duration,
+            interval: animateSettings.interval,
+            samplingRate: animateSettings.srate,
+          }),
+          fft({ bins: animateSettings.bins }),
+          powerByBand(),
+          catchError((err) => {
+            console.log(err);
+          })
+        );
+
+        pipeSpectra$ = zipSamples(channelData$).pipe(
+          bandpassFilter({
+            cutoffFrequencies: [
+              animateSettings.cutOffLow,
+              animateSettings.cutOffHigh,
+            ],
+            nbChannels: animateSettings.nbChannels,
+          }),
+          epoch({
+            duration: animateSettings.duration,
+            interval: animateSettings.interval,
+            samplingRate: animateSettings.srate,
+          }),
+          fft({ bins: animateSettings.bins }),
+          sliceFFT([1, 100]),
+          catchError((err) => {
+            console.log(err);
+          })
+        );  
 
         if (pipeline === 'bands') {
-          pipeBands$ = zipSamples(channelData$).pipe(
-            bandpassFilter({
-              cutoffFrequencies: [
-                animateSettings.cutOffLow,
-                animateSettings.cutOffHigh,
-              ],
-              nbChannels: animateSettings.nbChannels,
-            }),
-            epoch({
-              duration: animateSettings.duration,
-              interval: animateSettings.interval,
-              samplingRate: animateSettings.srate,
-            }),
-            fft({ bins: animateSettings.bins }),
-            powerByBand(),
-            catchError((err) => {
-              console.log(err);
-            })
-          );
+ 
           multicastBands$ = pipeBands$.pipe(multicast(() => new Subject()));
 
         } else if (pipeline === 'spectra') {
-
-          pipeSpectra$ = zipSamples(channelData$).pipe(
-            bandpassFilter({
-              cutoffFrequencies: [
-                animateSettings.cutOffLow,
-                animateSettings.cutOffHigh,
-              ],
-              nbChannels: animateSettings.nbChannels,
-            }),
-            epoch({
-              duration: animateSettings.duration,
-              interval: animateSettings.interval,
-              samplingRate: animateSettings.srate,
-            }),
-            fft({ bins: animateSettings.bins }),
-            sliceFFT([1, 100]),
-            catchError((err) => {
-              console.log(err);
-            })
-          );    
+  
           multicastBands$ = pipeSpectra$.pipe(multicast(() => new Subject()));
       
         }
 
-
-
         multicastBands$.subscribe((data) => {
-          if (pipeline === 'bands') {
-            brain.current = {
-              LeftBackDelta: 10 * data.delta[0],
-              LeftBackTheta: 10 * data.theta[0],
-              LeftBackAlpha: 10 * data.alpha[0],
-              LeftBackBeta: 10 * data.beta[0],
-              LeftBackGamma: 10 * data.gamma[0],
-              LeftFrontDelta: 10 * data.delta[1],
-              LeftFrontTheta: 10 * data.theta[1],
-              LeftFrontAlpha: 10 * data.alpha[1],
-              LeftFrontBeta: 10 * data.beta[1],
-              LeftFrontGamma: 10 * data.gamma[1],
-              RightFrontDelta: 10 * data.delta[2],
-              RightFrontTheta: 10 * data.theta[2],
-              RightFrontAlpha: 10 * data.alpha[2],
-              RightFrontBeta: 10 * data.beta[2],
-              RightFrontGamma: 10 * data.gamma[2],
-              RightBackDelta: 10 * data.delta[3],
-              RightBackTheta: 10 * data.theta[3],
-              RightBackAlpha: 10 * data.alpha[3],
-              RightBackBeta: 10 * data.beta[3],
-              RightBackGamma: 10 * data.gamma[3],
-              textMsg: "Data received",
-            }; 
-          } else if (pipeline === 'spectra') {
-            brainSpectra.current = {
-              LeftBackSpectra: data.psd[0],
-              LeftFrontSpectra: data.psd[1],
-              RightFrontSpectra: data.psd[2],
-              RightBackSpectra: data.psd[3],
-              frequencies: data.freqs,
-              textMsg: "Data received",
-            };          
-          }
-
+          brain.current = {
+            data: data,
+            textMsg: "Data received",
+          }; 
         });
 
         multicastBands$.connect();
@@ -283,7 +225,7 @@ export function Animate(connection) {
   }, [connection])
 
   function renderEditor() {
-    const scope = { styled, brain, brainSpectra, React, Sketch };
+    const scope = { styled, brain, React, Sketch };
 
     return (  
         <LiveProvider
