@@ -126,10 +126,10 @@ export function Animate(connection) {
     readFile(pathPrefix + 'BasicFrequencyBands.p5')
   }, []) // <-- empty dependency array
 
-  const pipeline = 'bands';
+  const pipeline = 'spectra';
 
   const brain = useRef({
-    data: {},
+    data: {delta:[], theta:[], alpha:[], beta:[], gamma:[]},
     textMsg: "No data.",
   });
 
@@ -194,7 +194,7 @@ export function Animate(connection) {
             samplingRate: animateSettings.srate,
           }),
           fft({ bins: animateSettings.bins }),
-          sliceFFT([1, 60]),
+          sliceFFT([1, 128]),
           catchError((err) => {
             console.log(err);
           })
