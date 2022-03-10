@@ -311,7 +311,7 @@ export function Animate(connection) {
           'editable. Play around with the numbers and see what happens. The',
           'brain.current variables are only available if there is a data source',
           'connected. EEG bands and locations are available by calling ' ,
-          'brain.current.RightFrontAlpha, for example.',
+          'brain.current.data.alpha[0], for example for the left ear electrode alpha.',
         ]}
         </p>
         <br />
