@@ -125,7 +125,7 @@ export function Animate(connection) {
     readFile(pathPrefix + 'BasicFrequencyBands.p5')
   }, []) // <-- empty dependency array
 
-  const pipeline = 'bands';
+  const pipeline = 'spectra';
 
   const brain = useRef({
       LeftBackDelta: 0,
@@ -237,8 +237,7 @@ export function Animate(connection) {
 
 
         multicastBands$.subscribe((data) => {
-          console.log(data)
-          if (pipeline = 'bands') {
+          if (pipeline === 'bands') {
             brain.current = {
               LeftBackDelta: 10 * data.delta[0],
               LeftBackTheta: 10 * data.theta[0],
@@ -262,7 +261,7 @@ export function Animate(connection) {
               RightBackGamma: 10 * data.gamma[3],
               textMsg: "Data received",
             }; 
-          } else if (pipeline = 'spectra') {
+          } else if (pipeline === 'spectra') {
             brainSpectra.current = {
               LeftBackSpectra: data.psd[0],
               LeftFrontSpectra: data.psd[1],
