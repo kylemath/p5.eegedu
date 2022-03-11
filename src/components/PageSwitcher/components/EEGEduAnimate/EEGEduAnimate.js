@@ -118,6 +118,14 @@ export function Animate(connection) {
     []
   );
 
+  const [selectedPipeline, setSelectedPipeline] = useState('bands');  
+  const handleSelectPipelineChange = useCallback((value) =>
+    {
+      setSelectedPipeline(value)
+    },
+    []
+  );
+
  // Main file in use
   const [fileContents, setFileContents] = useState();
 
@@ -126,10 +134,8 @@ export function Animate(connection) {
     readFile(pathPrefix + 'BasicFrequencyBands.p5')
   }, []) // <-- empty dependency array
 
-  const pipeline = 'bands';
-
   const brain = useRef({
-    data: {delta:[], theta:[], alpha:[], beta:[], gamma:[]},
+    data: {delta:[0], theta:[0], alpha:[0], beta:[0], gamma:[0], psd:[0], freqs:[0], info:' '},
     textMsg: "No data.",
   });
 
@@ -200,18 +206,17 @@ export function Animate(connection) {
           })
         );    
 
-        if (pipeline === 'bands') {
+        if (selectedPipeline === 'bands') {
 
           multicastBands$ = pipeBands$.pipe(multicast(() => new Subject()));
 
-        } else if (pipeline === 'spectra') {
+        } else if (selectedPipeline === 'spectra') {
 
           multicastBands$ = pipeSpectra$.pipe(multicast(() => new Subject()));
       
         }
 
         multicastBands$.subscribe((data) => {
-          console.log(data)
           brain.current = {
             data: data,
             textMsg: "Data received",
@@ -224,7 +229,7 @@ export function Animate(connection) {
 
     buildBrain();
 
-  }, [connection])
+  }, [connection, selectedPipeline])
 
   function renderEditor() {
     const scope = { styled, brain, React, Sketch };
@@ -236,6 +241,12 @@ export function Animate(connection) {
           noInline={true}
           theme={theme}
         >
+        <Select
+            label="Select Pipeline"
+            options={['bands', 'spectra']}
+            onChange={handleSelectPipelineChange}
+            value={selectedPipeline}
+          />     
          <Select
             label="Select Example Code"
             options={options}
