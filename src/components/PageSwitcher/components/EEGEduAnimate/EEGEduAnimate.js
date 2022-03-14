@@ -21,7 +21,7 @@ import { saveAs } from "file-saver";
 import { mockMuseEEG } from "../../utils/mockMuseEEG";
 import { chartStyles } from "../chartOptions";
 import theme from "./p5Theme";
-import {protos} from "./utils";
+import protos from "./utils";
 
 const animateSettings = {
   cutOffLow: .1,
@@ -33,8 +33,8 @@ const animateSettings = {
   srate: 256,
 };
 
-const pathPrefix = 'https://raw.githubusercontent.com/kylemath/p5.eegedu.art/allInOne/';
-const address = 'https://api.github.com/repos/kylemath/p5.eegedu.art/git/trees/allInOne?recursive=1';
+const pathPrefix = 'https://raw.githubusercontent.com/kylemath/p5.eegedu.art/main/';
+const address = 'https://api.github.com/repos/kylemath/p5.eegedu.art/git/trees/main?recursive=1';
 
 export function Animate(connection) {
 
@@ -146,7 +146,6 @@ export function Animate(connection) {
   useEffect(()=>{
    console.log('Loading in Test File or first file');
     readFile(pathPrefix + 'BasicFrequencyBands.p5')
-    // setFileContents(testScript)
 
   }, []) // <-- empty dependency array
 
