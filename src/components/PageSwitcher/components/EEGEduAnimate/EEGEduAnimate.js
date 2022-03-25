@@ -10,6 +10,7 @@ import {
   ButtonGroup,
   Link,
   List,
+  RangeSlider,
 } from "@shopify/polaris";
 import { zipSamples, MuseClient } from "muse-js";
 import { bandpassFilter, epoch, fft, powerByBand } from "@neurosity/pipes";
@@ -24,6 +25,7 @@ import theme from "./p5Theme";
 import protos from "./utils";
 
 const animateSettings = {
+  name: 'EEG',
   cutOffLow: .1,
   cutOffHigh: 128,
   nbChannels: 4,
@@ -31,6 +33,8 @@ const animateSettings = {
   bins: 256,
   duration: 128,
   srate: 256,
+  sliceFFTLow: 1,
+  sliceFFTHigh: 100,
 };
 
 const pathPrefix = 'https://raw.githubusercontent.com/kylemath/p5.eegedu.art/main/';
@@ -49,6 +53,7 @@ export function Animate(connection) {
   // Main file in use
   // ------------------
   const [fileContents, setFileContents] = useState();
+  const [Settings, setSettings] = useState(animateSettings); 
 
 
   // Populate Select file list from github repo .art
@@ -64,6 +69,68 @@ export function Animate(connection) {
     oReq.send();
 
   }
+
+
+  function renderSliders(setSettings, Settings) {
+    function resetPipeSetup(value) {
+      //somehow rerrun buildbrian here
+      console.log('Reset the pipes here')
+      console.log(Settings)
+    }
+
+
+    function handleDurationRangeSliderChange(value) {
+      setSettings(prevState => ({...prevState, duration: value}));
+      resetPipeSetup();
+    }
+    function handleIntervalRangeSliderChange(value) {
+      setSettings(prevState => ({...prevState, interval: value}));
+      resetPipeSetup();
+    }
+    function handleCutoffLowRangeSliderChange(value) {
+      setSettings(prevState => ({...prevState, cutOffLow: value}));
+      resetPipeSetup();
+    }
+    function handleCutoffHighRangeSliderChange(value) {
+      setSettings(prevState => ({...prevState, cutOffHigh: value}));
+      resetPipeSetup();
+   }
+
+    return (
+      <Card title={Settings.name + ' Settings'} sectioned>
+        <RangeSlider 
+          disabled={connection.status.connected} 
+          min={.01} step={.5} max={Settings.cutOffHigh - .5}
+          label={'Filter Cutoff Frequency Low: ' + Settings.cutOffLow + ' Hz'} 
+          value={Settings.cutOffLow} 
+          onChange={handleCutoffLowRangeSliderChange} 
+        />
+        <RangeSlider 
+          disabled={connection.status.connected} 
+          min={Settings.cutOffLow + .5} step={.5} max={Settings.srate/2}
+          label={'Filter Cutoff Frequency High: ' + Settings.cutOffHigh + ' Hz'} 
+          value={Settings.cutOffHigh} 
+          onChange={handleCutoffHighRangeSliderChange} 
+        />          
+        <RangeSlider 
+          disabled={connection.status.connected} 
+          min={1} step={1} max={4096}
+          label={'Epoch duration (Sampling Points): ' + Settings.duration} 
+          value={Settings.duration} 
+          onChange={handleDurationRangeSliderChange} 
+        />          
+        <RangeSlider 
+          disabled={connection.status.connected} 
+          min={1} step={1} max={Settings.duration}
+          label={'Sampling points between epochs onsets: ' + Settings.interval} 
+          value={Settings.interval} 
+          onChange={handleIntervalRangeSliderChange} 
+        />
+  
+      </Card>
+    )
+  }
+
 
   let options = [];
   const [repoContents, setRepoContents] = useState();
@@ -185,15 +252,15 @@ export function Animate(connection) {
           pipeEpochs$ = zipSamples(channelData$).pipe(
             bandpassFilter({
               cutoffFrequencies: [
-                animateSettings.cutOffLow,
-                animateSettings.cutOffHigh,
+                Settings.cutOffLow,
+                Settings.cutOffHigh,
               ],
-              nbChannels: animateSettings.nbChannels,
+              nbChannels: Settings.nbChannels,
             }),
             epoch({
-              duration: animateSettings.duration,
-              interval: animateSettings.interval,
-              samplingRate: animateSettings.srate,
+              duration: Settings.duration,
+              interval: Settings.interval,
+              samplingRate: Settings.srate,
             })
           );
           pipeEpochs$.subscribe((dataEpoch) => {
@@ -211,17 +278,17 @@ export function Animate(connection) {
           pipeSpectra$ = zipSamples(channelData$).pipe(
             bandpassFilter({
               cutoffFrequencies: [
-                animateSettings.cutOffLow,
-                animateSettings.cutOffHigh,
+                Settings.cutOffLow,
+                Settings.cutOffHigh,
               ],
-              nbChannels: animateSettings.nbChannels,
+              nbChannels: Settings.nbChannels,
             }),
             epoch({
-              duration: animateSettings.duration,
-              interval: animateSettings.interval,
-              samplingRate: animateSettings.srate,
+              duration: Settings.duration,
+              interval: Settings.interval,
+              samplingRate: Settings.srate,
             }),
-            fft({ bins: animateSettings.bins })
+            fft({ bins: Settings.bins })
           );
           pipeSpectra$.subscribe((dataSpectra) => {
             brain.current.spectra = {
@@ -237,17 +304,17 @@ export function Animate(connection) {
           pipeBands$ = zipSamples(channelData$).pipe(
             bandpassFilter({
               cutoffFrequencies: [
-                animateSettings.cutOffLow,
-                animateSettings.cutOffHigh,
+                Settings.cutOffLow,
+                Settings.cutOffHigh,
               ],
-              nbChannels: animateSettings.nbChannels,
+              nbChannels: Settings.nbChannels,
             }),
             epoch({
-              duration: animateSettings.duration,
-              interval: animateSettings.interval,
-              samplingRate: animateSettings.srate,
+              duration: Settings.duration,
+              interval: Settings.interval,
+              samplingRate: Settings.srate,
             }),
-            fft({ bins: animateSettings.bins }),
+            fft({ bins: Settings.bins }),
             powerByBand()
           );          
           pipeBands$.subscribe((dataBands) => {
@@ -262,7 +329,7 @@ export function Animate(connection) {
 
     buildBrain();
 
-  }, [connection])
+  }, [connection, Settings])
 
   function renderEditor() {
     const scope = { styled, brain, React, Sketch };
@@ -404,8 +471,12 @@ export function Animate(connection) {
         </List>
       </Card.Section>
       <Card.Section>
+        <div style={chartStyles.wrapperStyle.style}>{renderSliders(setSettings, Settings)}</div>
+      </Card.Section>
+      <Card.Section>
         <div style={chartStyles.wrapperStyle.style}>{renderEditor()}</div>
       </Card.Section>
     </Card>
   );
 }
+
