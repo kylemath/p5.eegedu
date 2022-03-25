@@ -72,32 +72,25 @@ export function Animate(connection) {
 
 
   function renderSliders(setSettings, Settings) {
-    function resetPipeSetup(value) {
-      //somehow rerrun buildbrian here
-      console.log('Reset the pipes here')
-      console.log(Settings)
-    }
-
 
     function handleDurationRangeSliderChange(value) {
       setSettings(prevState => ({...prevState, duration: value}));
-      resetPipeSetup();
     }
     function handleIntervalRangeSliderChange(value) {
       setSettings(prevState => ({...prevState, interval: value}));
-      resetPipeSetup();
     }
     function handleCutoffLowRangeSliderChange(value) {
       setSettings(prevState => ({...prevState, cutOffLow: value}));
-      resetPipeSetup();
     }
     function handleCutoffHighRangeSliderChange(value) {
       setSettings(prevState => ({...prevState, cutOffHigh: value}));
-      resetPipeSetup();
    }
 
     return (
       <Card title={Settings.name + ' Settings'} sectioned>
+        These can be changed prior to connecting to the data stream.
+        <br />
+        <br />
         <RangeSlider 
           disabled={connection.status.connected} 
           min={.01} step={.5} max={Settings.cutOffHigh - .5}
