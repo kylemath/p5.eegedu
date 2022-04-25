@@ -40,6 +40,10 @@ const animateSettings = {
 const pathPrefix = 'https://raw.githubusercontent.com/kylemath/p5.eegedu.art/main/';
 const address = 'https://api.github.com/repos/kylemath/p5.eegedu.art/git/trees/main?recursive=1';
 
+const pathPrefixGal = 'https://raw.githubusercontent.com/kylemath/p5.eegedu.art/gallery/';
+const addressGal = 'https://api.github.com/repos/kylemath/p5.eegedu.art/git/trees/gallery?recursive=1';
+
+
 export function Animate(connection) {
 
   // Output Prototypes
@@ -59,9 +63,12 @@ export function Animate(connection) {
   // Populate Select file list from github repo .art
   //------------------------
 
-  function readRepoList(value) {
+  const [repoContents, setRepoContents] = useState();
+  const [repoContentsGal, setRepoContentsGal] = useState();
+
+  function readRepoList(value, set) {
     function reqListener () {
-      setRepoContents(this.responseText);
+      set(this.responseText);
     }
     var oReq = new XMLHttpRequest();
     oReq.addEventListener("load", reqListener);
@@ -70,67 +77,19 @@ export function Animate(connection) {
 
   }
 
-
-  function renderSliders(setSettings, Settings) {
-
-    function handleDurationRangeSliderChange(value) {
-      setSettings(prevState => ({...prevState, duration: value}));
-    }
-    function handleIntervalRangeSliderChange(value) {
-      setSettings(prevState => ({...prevState, interval: value}));
-    }
-    function handleCutoffLowRangeSliderChange(value) {
-      setSettings(prevState => ({...prevState, cutOffLow: value}));
-    }
-    function handleCutoffHighRangeSliderChange(value) {
-      setSettings(prevState => ({...prevState, cutOffHigh: value}));
-   }
-
-    return (
-      <Card title={Settings.name + ' Settings'} sectioned>
-        These can be changed prior to connecting to the data stream.
-        <br />
-        <br />
-        <RangeSlider 
-          disabled={connection.status.connected} 
-          min={.01} step={.5} max={Settings.cutOffHigh - .5}
-          label={'Filter Cutoff Frequency Low: ' + Settings.cutOffLow + ' Hz'} 
-          value={Settings.cutOffLow} 
-          onChange={handleCutoffLowRangeSliderChange} 
-        />
-        <RangeSlider 
-          disabled={connection.status.connected} 
-          min={Settings.cutOffLow + .5} step={.5} max={Settings.srate/2}
-          label={'Filter Cutoff Frequency High: ' + Settings.cutOffHigh + ' Hz'} 
-          value={Settings.cutOffHigh} 
-          onChange={handleCutoffHighRangeSliderChange} 
-        />          
-        <RangeSlider 
-          disabled={connection.status.connected} 
-          min={1} step={1} max={4096}
-          label={'Epoch duration (Sampling Points): ' + Settings.duration} 
-          value={Settings.duration} 
-          onChange={handleDurationRangeSliderChange} 
-        />          
-        <RangeSlider 
-          disabled={connection.status.connected} 
-          min={1} step={1} max={Settings.duration}
-          label={'Sampling points between epochs onsets: ' + Settings.interval} 
-          value={Settings.interval} 
-          onChange={handleIntervalRangeSliderChange} 
-        />
-  
-      </Card>
-    )
-  }
-
-
   let options = [];
-  const [repoContents, setRepoContents] = useState();
+  let optionsGallery = [];
+
   useEffect(()=>{
     console.log('Reading Repo List')
-    readRepoList(address)
+    readRepoList(address, setRepoContents)
   }, []) // <-- empty dependency array
+
+  useEffect(()=>{
+    console.log('Reading Repo List')
+    readRepoList(addressGal, setRepoContentsGal)
+  }, []) // <-- empty dependency array
+
 
   if (repoContents) {
     console.log('Parsing repo list');
@@ -145,6 +104,20 @@ export function Animate(connection) {
         })
       }
     }
+    if (repoContentsGal) {
+    console.log('Parsing repo Gal list');
+    const repoObjGal = JSON.parse(repoContentsGal)
+
+    for (let i = 0; i < repoObjGal.tree.length; i++) {
+      if (repoObjGal.tree[i].path.charAt(repoObjGal.tree[i].path.length-1) === '5') 
+      {
+        optionsGallery.push({
+          label: repoObjGal.tree[i].path, 
+          value: pathPrefixGal + repoObjGal.tree[i].path
+        })
+      }
+    }
+  }
   }
 
   // Read file from web
@@ -209,6 +182,62 @@ export function Animate(connection) {
 
   }, []) // <-- empty dependency array
 
+
+  // Render Sliders
+  // ---------------
+
+  function renderSliders(setSettings, Settings) {
+
+    function handleDurationRangeSliderChange(value) {
+      setSettings(prevState => ({...prevState, duration: value}));
+    }
+    function handleIntervalRangeSliderChange(value) {
+      setSettings(prevState => ({...prevState, interval: value}));
+    }
+    function handleCutoffLowRangeSliderChange(value) {
+      setSettings(prevState => ({...prevState, cutOffLow: value}));
+    }
+    function handleCutoffHighRangeSliderChange(value) {
+      setSettings(prevState => ({...prevState, cutOffHigh: value}));
+   }
+
+    return (
+      <Card title={Settings.name + ' Settings'} sectioned>
+        These can be changed prior to connecting to the data stream.
+        <br />
+        <br />
+        <RangeSlider 
+          disabled={connection.status.connected} 
+          min={.01} step={.5} max={Settings.cutOffHigh - .5}
+          label={'Filter Cutoff Frequency Low: ' + Settings.cutOffLow + ' Hz'} 
+          value={Settings.cutOffLow} 
+          onChange={handleCutoffLowRangeSliderChange} 
+        />
+        <RangeSlider 
+          disabled={connection.status.connected} 
+          min={Settings.cutOffLow + .5} step={.5} max={Settings.srate/2}
+          label={'Filter Cutoff Frequency High: ' + Settings.cutOffHigh + ' Hz'} 
+          value={Settings.cutOffHigh} 
+          onChange={handleCutoffHighRangeSliderChange} 
+        />          
+        <RangeSlider 
+          disabled={connection.status.connected} 
+          min={1} step={1} max={4096}
+          label={'Epoch duration (Sampling Points): ' + Settings.duration} 
+          value={Settings.duration} 
+          onChange={handleDurationRangeSliderChange} 
+        />          
+        <RangeSlider 
+          disabled={connection.status.connected} 
+          min={1} step={1} max={Settings.duration}
+          label={'Sampling points between epochs onsets: ' + Settings.interval} 
+          value={Settings.interval} 
+          onChange={handleIntervalRangeSliderChange} 
+        />
+  
+      </Card>
+    )
+  }
 
   // Wrap this whole thing in useEffect to control when it updates
   // it only updates when dependencies are changed, which in this case is just [connection]
@@ -354,6 +383,12 @@ export function Animate(connection) {
          <Select
             label="Select Example Code"
             options={options}
+            onChange={handleSelectWebCodeChange}
+            value={selectedWebCode}
+          />      
+           <Select
+            label="Select 2022 NeuroArt Class Gallery"
+            options={optionsGallery}
             onChange={handleSelectWebCodeChange}
             value={selectedWebCode}
           />      
