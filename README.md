@@ -2,7 +2,7 @@
 
 P5.EEGEdu is an educational website to learn about coding live animations with electroencephalogram (EEG) data. It is a teaching tool that allows for students to quickly interact with their own brain waves. 
 
-Visit [https://p5.eegedu.com/](https://p5.eegedu.com/]) for the live p5 sandbox website.
+Visit [https://kylemath.github.io/p5.eegedu/](https://kylemath.github.io/p5.eegedu/) for the live p5 sandbox website.
 
 # Installation for Development 
 
@@ -60,7 +60,7 @@ serve -s build
 
 ## Deployment
 
-[p5.EEGEdu](https://p5.eegedu.com) is running on [Firebase](https://firebase.google.com/) and deployment happens automagically using GitHub post-commit hooks, or [Actions](https://github.com/kylemath/EEGEdu/actions), as they are commonly called. You can see how the application is build and deployed by [inspecting the workflow](https://github.com/kylemath/EEGEdu/blob/master/.github/workflows/workflow.yml).
+[p5.EEGEdu](https://kylemath.github.io/p5.eegedu/) is hosted on [GitHub Pages](https://pages.github.com/). A push to `master` builds the React app and deploys it automatically. You can see how the application is built and deployed by [inspecting the workflow](https://github.com/kylemath/p5.eegedu/blob/master/.github/workflows/workflow.yml).
 
 # Contributing
 The guide for contributors can be found [here](https://github.com/kylemath/EEGEdu/blob/master/CONTRIBUTING.md). It covers everything you need to know to start contributing to p5.EEGEdu.

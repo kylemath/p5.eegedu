@@ -6,6 +6,7 @@
   "name": "eegedu",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://kylemath.github.io/p5.eegedu",
   "dependencies": {
     "@neurosity/pipes": "^3.0.2",
     "@shopify/polaris": "^4.9.0",

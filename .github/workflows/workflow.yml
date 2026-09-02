@@ -1,59 +1,53 @@
-# .github/workflows/nodejs.yml
-name: Build and Deploy to Firebase
+# .github/workflows/workflow.yml
+name: Build and Deploy to GitHub Pages
 
-on: 
-  push: # Run on Push Requests
+on:
+  push:
     branches:
       - master
-  
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [10.x] # Only run the 10.x build
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@master
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@master
+        uses: actions/checkout@v4
+      - name: Use Node.js 16
+        uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
-      - name: Install Yarn
-        run: npm install -g yarn
+          node-version: 16
+          cache: yarn
       - name: Install Dependencies
         run: yarn install
       - name: Build
         run: yarn build
-      - name: Archive Produciton Artifacts
-        uses: actions/upload-artifact@master
+      - name: Add GitHub Pages helpers
+        run: |
+          cp build/index.html build/404.html
+          touch build/.nojekyll
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: build
           path: build
+
   deploy:
-    name: Deploy to Firebase
+    name: Deploy to GitHub Pages
     needs: build
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [10.x] # Only run the 10.x build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@master
-      - name: Download Build Artifacts
-        uses: actions/download-artifact@master
-        with:
-          name: build
-          path: build
-      - name: Display structure of downloaded files
-        run: ls -R
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@master
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: Deploy to Firebase
-        uses: w9jds/firebase-action@master
-        with:
-          args: deploy --only hosting
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
