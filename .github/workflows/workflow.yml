@@ -19,6 +19,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      YARN_IGNORE_ENGINES: "1"
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
